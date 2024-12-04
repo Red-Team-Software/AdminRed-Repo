@@ -60,8 +60,15 @@ export const Navbar = () => {
       </NavbarContent>
 
       <NavbarContent justify="end">
+        <Link isExternal href={siteConfig.links.discord} title="Discord">
+        <DiscordIcon className="text-default-500" />
+        </Link>
+        <Link isExternal href={siteConfig.links.github} title="GitHub">
+          <GithubIcon className="text-default-500" />
+        </Link>
+        <ThemeSwitch />
         <NavbarItem>
-          <Button  variant="flat" className="mx-4" color="danger" onClick={handleLogout}>
+          <Button  variant="flat" className="mx-2" color="danger" onClick={handleLogout}>
             Logout
           </Button>
         </NavbarItem>
