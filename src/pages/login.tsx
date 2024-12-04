@@ -55,8 +55,9 @@ export default function LoginPage() {
       </NavbarContent>
 
     </NextUINavbar>
-    <div className='w-full h-screen flex justify-center items-center'>
-      <Card className='w-full max-w-md m-2 p-8'>
+
+    <div className='h-screen flex justify-center items-center'>
+      <Card className='w-full max-w-md mx-2 p-8'>
         <h1 className='text-red-900 font-extrabold text-3xl text-center mb-4'>Login to Access</h1>
         <Formik
           initialValues={{ email: '', password: '' }}

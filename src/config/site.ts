@@ -1,13 +1,9 @@
 export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
-  name: "Vite + NextUI",
-  description: "Make beautiful websites regardless of your design experience.",
+  name: "Admin-RedGodely",
+  description: "Admin-RedGodely is a web application that allows you to manage products, bundles, categories, and promotions.",
   navItems: [
-    {
-      label: "Home",
-      href: "/",
-    },
     {
       label: "Products",
       href: "/products",
@@ -25,45 +21,9 @@ export const siteConfig = {
       href: "/promotions",
     },
   ],
-  navMenuItems: [
-    {
-      label: "Profile",
-      href: "/profile",
-    },
-    {
-      label: "Dashboard",
-      href: "/dashboard",
-    },
-    {
-      label: "Projects",
-      href: "/projects",
-    },
-    {
-      label: "Team",
-      href: "/team",
-    },
-    {
-      label: "Calendar",
-      href: "/calendar",
-    },
-    {
-      label: "Settings",
-      href: "/settings",
-    },
-    {
-      label: "Help & Feedback",
-      href: "/help-feedback",
-    },
-    {
-      label: "Logout",
-      href: "/logout",
-    },
-  ],
   links: {
-    github: "https://github.com/nextui-org/nextui",
-    twitter: "https://twitter.com/getnextui",
-    docs: "https://nextui.org",
-    discord: "https://discord.gg/9b6yyZKmH4",
-    sponsor: "https://patreon.com/jrgarciadev",
+    github: "https://github.com/Red-Team-Software",
+    discord: "https://discordapp.com/channels/1302812306501013546/1302812307088474144",
+    sponsor: "https://modulo7.ucab.edu.ve/",
   },
 };
