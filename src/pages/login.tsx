@@ -78,12 +78,9 @@ export default function LoginPage() {
             try {
               const {data} = await axios.post(apiUrl + '/auth/login', values);
 
-              console.log(data);
-
               sessionStorage.setItem('token', data.token);
-              console.log(sessionStorage.getItem('token'));
+
               navigate('/products');
-              // Handle successful login (e.g., redirect to another page)
             } catch (e) {
               console.log(e);
               if (e instanceof Error) {

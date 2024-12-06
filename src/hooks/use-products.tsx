@@ -3,7 +3,7 @@ import axios from 'axios';
 
 
 const apiUrl = import.meta.env.VITE_APIURL;
-const token = sessionStorage.getItem('token'); // Obtén el token de localStorage
+
 
 export interface Product {
     id: string;
@@ -23,10 +23,11 @@ const useProducts = () => {
     const fetchProducts = async () => {
         setIsLoading(true);
         setError(null);
+
         try {
             const response = await axios.get<Product[]>(apiUrl + '/product/all', {
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${sessionStorage.getItem('token')}`,
                 },
                 params: {
                     page,
@@ -45,7 +46,12 @@ const useProducts = () => {
     };
 
     useEffect(() => {
-        fetchProducts();
+        const token = sessionStorage.getItem('token');
+        if (token) {
+            fetchProducts();
+        } else {
+            setError('No token found');
+        }
     }, [page]);
 
     function handlePage(p: number): void {
