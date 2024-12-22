@@ -1,11 +1,12 @@
 import { Route, Routes } from "react-router-dom";
 
 import LoginPage from "@/pages/login";
-import BundlesPage from "@/pages/bundles";
-import CategoriesPage from "@/pages/categories";
-import ProductsPage from "@/pages/products";
+import BundlesPage from "@/pages/bundles/bundles";
+import CategoriesPage from "@/pages/categories/categories";
+import ProductsPage from "@/pages/products/products";
 import PromotionsPage from "@/pages/promotions";
 import ProtectedRoute from "@/config/protected-route";
+import ProductDetailsPage from "./pages/products/productDetails";
 
 
 function App() {

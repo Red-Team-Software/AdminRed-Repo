@@ -1,12 +1,26 @@
+import { useState } from "react";
 import { title } from "@/components/primitives";
 import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Button } from "@nextui-org/react";
-import useProducts from "@/hooks/use-products";
+import useProducts from "@/hooks/products/use-products";
 import DefaultLayout from "@/layouts/default";
 import ButtonsPagination from "@/components/buttons-pagination";
+import ProductDetailsPage from "./productDetails";
 
 export default function ProductsPage() {
 
   const {products, isLoading, error, page, handlePage} = useProducts();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
+
+  const handleOpenModal = (id: string) => {
+    setSelectedProduct(id);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedProduct(null);
+  };
 
   return (
     <DefaultLayout>
@@ -33,7 +47,7 @@ export default function ProductsPage() {
                       <TableCell>{product.price} $</TableCell>
                       <TableCell>{product.currency}</TableCell>
                       <TableCell className="flex gap-1 justify-center items-center">
-                        <Button color="primary" size="sm" variant="flat">View</Button>
+                        <Button color="primary" size="sm"  variant="flat" onPress={() => handleOpenModal(product.id)}>View</Button>
                         <Button color="warning" size="sm" variant="flat">Edit</Button>
                         <Button color="danger" size="sm" variant="flat">Delete</Button>
                       </TableCell>
@@ -51,6 +65,15 @@ export default function ProductsPage() {
           />
         </div>
       </section>
+
+      {isModalOpen && (
+        <ProductDetailsPage
+          id={selectedProduct!}
+          isOpen={isModalOpen}
+          onOpen={handleCloseModal}
+        />
+      )}
+
     </DefaultLayout>
   );
 }
