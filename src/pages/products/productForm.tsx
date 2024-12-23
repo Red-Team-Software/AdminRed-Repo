@@ -1,8 +1,10 @@
-import useProductDetails from "@/hooks/products/use-product-details"
-import { Modal, ModalBody, ModalContent, ModalHeader, Input, Button, Textarea, ModalFooter, DatePicker, DateValue, CalendarDate } from "@nextui-org/react";
-import { Form, Formik } from "formik"
+import useProductForm from "@/hooks/products/use-product-form"
+import { Modal, ModalBody, ModalContent, ModalHeader, Input, Button, Textarea, ModalFooter, DateValue, DateInput } from "@nextui-org/react";
+import { Form, Formik, FormikErrors } from "formik"
 import { useState } from "react"
 import ReactDOM from "react-dom"
+import { CalendarDate, parseDate } from "@internationalized/date";
+import { ProductFormValues } from "@/hooks/products/use-product-form";
 
 interface ProductFormProps {
     id?: string;
@@ -10,62 +12,18 @@ interface ProductFormProps {
     onOpen: () => void;
 }
 
-interface ProductFormValues {
-    id?: string;
-    name: string;
-    price: number;
-    description: string;
-    caducityDate: DateValue;
-    stock: number;
-    images: File[];
-    currency: string;
-    weigth: number;
-    measurement: string;
-}
 
 function ProductForm({ id, isOpen, onOpen }: ProductFormProps) {
 
-    const [initialProduct, setInitialProduct] = useState<ProductFormValues>({
-        name: "",
-        price: 0,
-        description: "",
-        caducityDate: new CalendarDate(2024, 1, 1),
-        stock: 0,
-        images: [],
-        currency: "",
-        weigth: 0,
-        measurement: "",
-    });
+    const { initialProduct, isFetching, errorSaving } = useProductForm(id);
 
-    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files) {
-            const filesArray = Array.from(event.target.files);
-            setInitialProduct((prevState) => ({
-                ...prevState,
-                images: filesArray,
-            }));
+    
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, setFieldValue: (field: string, value: any) => void) => {
+        const files = event.target.files;
+        if (files) {
+            setFieldValue('images', Array.from(files));
         }
     };
-
-    const handleDateChange = (date: DateValue) => {
-        setInitialProduct((prevState) => ({
-            ...prevState,
-            caducityDate: date,
-        }));
-    };
-
-    if (id) {
-        const { product, isLoading, error } = useProductDetails(id);
-        if (isLoading) {
-            return <div>Loading...</div>
-        }
-        if (error) {
-            return <div>Error Fetching product to Edit: {error}</div>
-        }
-        if (product) {
-            // setInitialProduct(product)
-        }
-    }
 
     const container = document.getElementById('overlays') as HTMLElement;
     return ReactDOM.createPortal(
@@ -76,11 +34,56 @@ function ProductForm({ id, isOpen, onOpen }: ProductFormProps) {
                 <ModalBody>
                     <Formik
                         initialValues={initialProduct}
-                        onSubmit={(values) => {
-                            console.log(values)
+                        validate={(values, ) => {
+                            const errors: FormikErrors<ProductFormValues> = {};
+                            if (!values.name || values.name.trim() === "" || values.name.length < 3) {
+                                errors.name = "Required and must be at least 3 characters";
+                            }
+                            if (!values.description || values.description.trim() === "" || values.description.length < 8) {
+                                errors.description = "Required and must be at least 8 characters";
+                            }
+                            if (!values.price || parseFloat(values.price) < 1) {
+                                errors.price = "Required and must be greater than 1";
+                            }
+
+                            if (!values.currency || values.currency.trim() === "") {
+                                errors.currency = "Required";
+                            }
+                            if (!values.stock || parseFloat(values.stock) < 1) {
+                                errors.stock = "Required and must be greater than 1";
+                            }
+
+                            if (!values.weigth || parseFloat(values.weigth) < 1) {
+                                errors.weigth = "Required and must be greater than 1";
+                            }
+
+                            if (!values.measurement) {
+                                errors.measurement = "Required";
+                            }
+
+                            if (!values.images || values.images.length < 1) {
+                                errors.images = "Required";
+                            }
+
+                            return errors;
+                        }}
+                        onSubmit={async (values, { setSubmitting }) => {
+
+                            setSubmitting(true);
+                            const formattedValues = {
+                                ...values,
+                                price: parseFloat(values.price),
+                                stock: parseInt(values.stock),
+                                weight: parseFloat(values.weigth),
+                                caducityDate: values.caducityDate.toString(),
+                                // images: values.images.map((file: File) => file.name)
+                            };
+                            console.log(formattedValues);
+
+                            setSubmitting(false);
                         }}
                     >
-                        {({ values, handleChange, handleSubmit }) => (
+                        {({ values, handleChange, handleSubmit, handleBlur, touched, errors, isSubmitting, isValid, setFieldValue }) => (
                             <Form onSubmit={handleSubmit} className="flex flex-col gap-3">
                                 <Input
                                     type="text"
@@ -88,77 +91,131 @@ function ProductForm({ id, isOpen, onOpen }: ProductFormProps) {
                                     label="Name"
                                     placeholder="Enter product name"
                                     value={values.name}
+                                    onBlur={handleBlur}
                                     onChange={handleChange}
+                                    isRequired
+                                    validate={() => {
+                                        if (touched.name && errors.name)
+                                            return errors.name;
+                                    }}
                                 />
+
                                 <Textarea
+                                    isRequired
                                     name="description"
                                     label="Description"
                                     placeholder="Enter product description"
                                     value={values.description}
                                     onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    validate={() => {
+                                        if (errors.description && touched.description)
+                                            return errors.description;
+                                    }}
                                 />
                                 <div className="grid grid-cols-2 gap-4">
                                     <Input
+                                        isRequired
                                         startContent={
                                             <div className="pointer-events-none flex items-center">
                                                 <span className="text-default-400 text-small">$</span>
                                             </div>
                                         }
-                                        label="Price"
-                                        placeholder="0.00"
                                         type="number"
+                                        name="price"
+                                        label="Price"
+                                        placeholder="1.00"
+                                        value={values.price}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+
+                                        validate={() => {
+                                            if (errors.price && touched.price)
+                                                return errors.price;
+                                        }}
                                     />
                                     <Input
+                                        isRequired
                                         type="text"
                                         name="currency"
                                         label="Currency"
                                         placeholder="USD"
                                         value={values.currency}
+                                        onBlur={handleBlur}
                                         onChange={handleChange}
+                                        validate={() => {
+                                            if (errors.currency && touched.currency)
+                                                return errors.currency;
+                                        }}
                                     />
-                                    <DatePicker className="max-w-[284px]"
-                                        name="caducityDate"
-                                        label="Caducity Date"
-                                        value={values.caducityDate}
-                                        onChange={handleDateChange}
-                                    />
+                                    <DateInput
+                                    name="caducityDate"
+                                    label="Caducity Date"
+                                    value={values.caducityDate}
+                                    onChange={(date) => setFieldValue('caducityDate', date)}
+                                    onBlur={handleBlur}
+                                />
+                                {/* {touched.caducityDate && errors.caducityDate && <div className="error">{errors.caducityDate}</div>} */}
+
                                     <Input
+                                        isRequired
                                         type="number"
                                         name="stock"
                                         label="Stock"
                                         placeholder="0"
-                                        //value={values.stock}
+                                        value={values.stock}
+                                        onBlur={handleBlur}
                                         onChange={handleChange}
+                                        validate={() => {
+                                            if (errors.stock && touched.stock)
+                                                return errors.stock;
+                                        }}
                                     />
 
                                     <Input
+                                        isRequired
                                         type="number"
                                         name="weigth"
                                         label="Weigth"
                                         placeholder="0.00"
-                                        //value={values.weigth}
-                                        onChange={handleChange}
+                                        value={values.weigth}
+                                        onBlur={handleBlur}
+                                        onChange={(date) => setFieldValue('caducityDate', date)}    
+                                        validate={() => {
+                                            if (errors.weigth && touched.weigth)
+                                                return errors.weigth;
+                                        }}
                                     />
                                     <Input
                                         type="text"
                                         name="measurement"
                                         label="Measurement"
-                                        placeholder="Kg"
+                                        placeholder="g"
                                         value={values.measurement}
+                                        onBlur={handleBlur}
                                         onChange={handleChange}
+                                        validate={() => {
+                                            if (errors.measurement && touched.measurement)
+                                                return errors.measurement;
+                                        }}
                                     />
 
                                 </div>
                                 <Input
+                                    isRequired
                                     type="file"
                                     name="images"
                                     label="Images"
                                     multiple
-                                    onChange={handleImageChange}
+                                    onChange={(event) => handleFileChange(event, setFieldValue)}
+                                    validate={() => {
+                                        if (errors.images && touched.images)
+                                            return errors.images.toString();
+                                    }}
                                 />
                                 <ModalFooter className="flex justify-center py-4">
                                     <Button size="lg" color="danger" onPress={onOpen}>Cancel</Button>
-                                    <Button size="lg" color="success" type="submit" className="text-white">Submit</Button>
+                                    <Button size="lg" color="success" type="submit" disabled={!isValid || isSubmitting} className="text-white disabled:bg-slate-400">Save</Button>
                                 </ModalFooter>
                             </Form>
                         )}

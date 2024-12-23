@@ -1,4 +1,4 @@
-import { Formik } from 'formik';
+import { Form, Formik } from 'formik';
 import { useState } from 'react';
 import { Card , Input, Button, Link } from "@nextui-org/react";
 import {
@@ -14,7 +14,7 @@ import {
   GithubIcon,
   DiscordIcon,
 } from "@/components/icons";
-import axios from 'axios';
+import axios, { Axios, AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 export default function LoginPage() {
@@ -83,8 +83,8 @@ export default function LoginPage() {
               navigate('/products');
             } catch (e) {
               console.log(e);
-              if (e instanceof Error) {
-                setError(e.message);
+              if (e instanceof AxiosError) {
+                setError(e.response?.data.message);
               } else {
                 setError(String(e));
               }
@@ -103,7 +103,7 @@ export default function LoginPage() {
             isSubmitting,
             /* and other goodies */
           }) => (
-            <form onSubmit={handleSubmit}>
+            <Form onSubmit={handleSubmit}>
               <div className='mb-4'>
                 <Input
                   type="email"
@@ -133,7 +133,7 @@ export default function LoginPage() {
               <Button type="submit" disabled={isSubmitting} className='w-full' color="success">
                 {isSubmitting ? 'Loading...' : 'Submit'}
               </Button>
-            </form>
+            </Form>
           )}
         </Formik>
 
