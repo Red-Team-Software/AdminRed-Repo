@@ -1,25 +1,26 @@
 import { useState } from "react";
 import { title } from "@/components/primitives";
 import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Button } from "@nextui-org/react";
-import useProducts from "@/hooks/products/use-products";
+import useProducts, { Product } from "@/hooks/products/use-products";
 import DefaultLayout from "@/layouts/default";
 import ButtonsPagination from "@/components/buttons-pagination";
 import ProductDetailsPage from "./productDetails";
 import ProductForm from "./productForm";
+import DeleteModal from "@/components/delete-modal";
 
 enum ModalTarget {"VIEW", "INSERT", "EDIT", "DELETE"}
 
 export default function ProductsPage() {
 
-  const {products, isLoading, error, page, handlePage} = useProducts();
+  const {products, isLoading, error, page, handlePage, deleteProduct} = useProducts();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalTargetState, setModalTargetState] = useState<ModalTarget>(ModalTarget.VIEW);
-  const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const handleOpenModal = (target: ModalTarget, id?: string) => {
     setModalTargetState(target);
     if (id) {
-      setSelectedProduct(id);
+      setSelectedProduct(products.find((product) => product.id === id) || null);
     }
     setIsModalOpen(true);
   };
@@ -59,8 +60,8 @@ export default function ProductsPage() {
                       <TableCell>{product.currency}</TableCell>
                       <TableCell className="flex gap-1 justify-center items-center">
                         <Button color="primary" size="sm"  variant="flat" onPress={() => handleOpenModal(ModalTarget.VIEW, product.id)}>View</Button>
-                        <Button color="warning" size="sm" variant="flat" onPress={() => handleOpenModal(ModalTarget.VIEW, product.id)}>Edit</Button>
-                        <Button color="danger" size="sm" variant="flat" onPress={() => handleOpenModal(ModalTarget.VIEW, product.id)}>Delete</Button>
+                        <Button color="warning" size="sm" variant="flat" onPress={() => handleOpenModal(ModalTarget.EDIT, product.id)}>Edit</Button>
+                        <Button color="danger" size="sm" variant="flat" onPress={() => handleOpenModal(ModalTarget.DELETE, product.id)}>Delete</Button>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -79,7 +80,7 @@ export default function ProductsPage() {
 
       {isModalOpen && modalTargetState === ModalTarget.VIEW && (
         <ProductDetailsPage
-          id={selectedProduct!}
+          id={selectedProduct!.id}
           isOpen={isModalOpen}
           onOpen={handleCloseModal}
         />
@@ -93,18 +94,22 @@ export default function ProductsPage() {
       )} 
 
       {isModalOpen && modalTargetState === ModalTarget.EDIT && (
-        <ProductDetailsPage
-          id={selectedProduct!}
-          isOpen={isModalOpen}
-          onOpen={handleCloseModal}
-        />
+        <ProductForm
+        isOpen={isModalOpen}
+        onOpen={handleCloseModal}
+        id={selectedProduct!.id}
+      />
       )} 
 
       {isModalOpen && modalTargetState === ModalTarget.DELETE && (
-        <ProductDetailsPage
-          id={selectedProduct!}
+        <DeleteModal
+          title={selectedProduct!.name}
           isOpen={isModalOpen}
           onOpen={handleCloseModal}
+          onConfirm={() => {
+            deleteProduct(selectedProduct!.id);
+            handleCloseModal();
+          }}
         />
       )} 
 

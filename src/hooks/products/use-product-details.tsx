@@ -4,6 +4,15 @@ import axios from 'axios';
 
 const apiUrl = import.meta.env.VITE_APIURL;
 
+const axiosInstance = axios.create({
+    baseURL: apiUrl,
+    timeout: 1000,
+    headers: {
+        // 'Content-Type': 'application/json',
+        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+    },
+});
+
 interface IPromotions {
     id: string;
     name: string;
@@ -35,17 +44,13 @@ const useProductDetails = (idProduct: string) => {
         setError(null);
 
         try {
-            const response = await axios.get<ProductDetails>(apiUrl + '/product', {
-                headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-                },
+            const response = await axiosInstance.get<ProductDetails>('/product', {
                 params: {
                     id: idProduct,
                 },
             }
             );
             setProduct(response.data);
-            console.log(product);
         } catch (err: any) {
             setError(err.message);
         } finally {

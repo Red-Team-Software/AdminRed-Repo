@@ -4,6 +4,12 @@ import axios from 'axios';
 
 const apiUrl = import.meta.env.VITE_APIURL;
 
+const axiosInstance = axios.create({
+    baseURL: apiUrl + '/product',
+    headers: {
+        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+    },
+});
 
 export interface Product {
     id: string;
@@ -25,10 +31,7 @@ const useProducts = () => {
         setError(null);
 
         try {
-            const response = await axios.get<Product[]>(apiUrl + '/product/all', {
-                headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-                },
+            const response = await axiosInstance<Product[]>('/all', {
                 params: {
                     page,
                     perPage: 10,
@@ -43,6 +46,20 @@ const useProducts = () => {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const deleteProduct = async (id: string) => {
+        // setIsLoading(true);
+        // setError(null);
+
+        // try {
+        //     await axiosInstance.delete(`/${id}`);
+        //     fetchProducts();
+        // } catch (err: any) {
+        //     setError(err.message);
+        // } finally {
+        //     setIsLoading(false);
+        // }
     };
 
     useEffect(() => {
@@ -60,7 +77,7 @@ const useProducts = () => {
         }
     }
 
-    return { products, isLoading, error, page, handlePage };
+    return { products, isLoading, error, page, handlePage, deleteProduct };
 };
 
 export default useProducts;

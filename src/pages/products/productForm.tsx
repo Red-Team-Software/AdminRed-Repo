@@ -1,10 +1,18 @@
-import useProductForm from "@/hooks/products/use-product-form"
-import { Modal, ModalBody, ModalContent, ModalHeader, Input, Button, Textarea, ModalFooter, DateValue, DateInput } from "@nextui-org/react";
-import { Form, Formik, FormikErrors } from "formik"
-import { useState } from "react"
-import ReactDOM from "react-dom"
-import { CalendarDate, parseDate } from "@internationalized/date";
-import { ProductFormValues } from "@/hooks/products/use-product-form";
+import useProductForm from "@/hooks/products/use-product-form";
+import {
+    Modal,
+    ModalBody,
+    ModalContent,
+    ModalHeader,
+    Input,
+    Button,
+    Textarea,
+    ModalFooter,
+    DateInput,
+} from "@nextui-org/react";
+import { Form, Formik, FormikErrors } from "formik";
+import ReactDOM from "react-dom";
+import { ProductFormValues } from "@/hooks/products/use-product-form"; 
 
 interface ProductFormProps {
     id?: string;
@@ -12,35 +20,45 @@ interface ProductFormProps {
     onOpen: () => void;
 }
 
-
 function ProductForm({ id, isOpen, onOpen }: ProductFormProps) {
+    const { initialProduct, isFetching, errorSaving, saveProductApi } = useProductForm(id);
 
-    const { initialProduct, isFetching, errorSaving } = useProductForm(id);
-
-    
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, setFieldValue: (field: string, value: any) => void) => {
+    const handleFileChange = (
+        event: React.ChangeEvent<HTMLInputElement>,
+        setFieldValue: (field: string, value: any) => void
+    ) => {
         const files = event.target.files;
         if (files) {
-            setFieldValue('images', Array.from(files));
+            setFieldValue("images", Array.from(files));
         }
     };
 
-    const container = document.getElementById('overlays') as HTMLElement;
+    const container = document.getElementById("overlays") as HTMLElement;
     return ReactDOM.createPortal(
-
-        <Modal isOpen={isOpen} scrollBehavior="inside" size="4xl" onClose={onOpen} >
+        <Modal isOpen={isOpen} scrollBehavior="inside" size="4xl" onClose={onOpen}>
             <ModalContent>
-                <ModalHeader className="flex justify-center">Product Form</ModalHeader>
+                <ModalHeader className="flex justify-center">{id ? "Edit" : "Create"} Product Form</ModalHeader>
+                
                 <ModalBody>
                     <Formik
+                        enableReinitialize={true}
                         initialValues={initialProduct}
-                        validate={(values, ) => {
+                        validate={(values) => {
                             const errors: FormikErrors<ProductFormValues> = {};
-                            if (!values.name || values.name.trim() === "" || values.name.length < 3) {
+                            if (
+                                !values.name ||
+                                values.name.trim() === "" ||
+                                values.name.length < 3
+                            ) {
                                 errors.name = "Required and must be at least 3 characters";
                             }
-                            if (!values.description || values.description.trim() === "" || values.description.length < 8) {
-                                errors.description = "Required and must be at least 8 characters";
+                            if (
+                                !values.description ||
+                                values.description.trim() === "" ||
+                                values.description.length < 8
+                            ) {
+                                errors.description =
+                                    "Required and must be at least 8 characters";
                             }
                             if (!values.price || parseFloat(values.price) < 1) {
                                 errors.price = "Required and must be greater than 1";
@@ -68,23 +86,27 @@ function ProductForm({ id, isOpen, onOpen }: ProductFormProps) {
                             return errors;
                         }}
                         onSubmit={async (values, { setSubmitting }) => {
-
                             setSubmitting(true);
-                            const formattedValues = {
-                                ...values,
-                                price: parseFloat(values.price),
-                                stock: parseInt(values.stock),
-                                weight: parseFloat(values.weigth),
-                                caducityDate: values.caducityDate.toString(),
-                                // images: values.images.map((file: File) => file.name)
-                            };
-                            console.log(formattedValues);
+                            
+                            console.log(values);
+                            await saveProductApi(values, id);
 
                             setSubmitting(false);
                         }}
                     >
-                        {({ values, handleChange, handleSubmit, handleBlur, touched, errors, isSubmitting, isValid, setFieldValue }) => (
+                        {({
+                            values,
+                            handleChange,
+                            handleSubmit,
+                            handleBlur,
+                            touched,
+                            errors,
+                            isSubmitting,
+                            isValid,
+                            setFieldValue,
+                        }) => (
                             <Form onSubmit={handleSubmit} className="flex flex-col gap-3">
+                                
                                 <Input
                                     type="text"
                                     name="name"
@@ -95,8 +117,7 @@ function ProductForm({ id, isOpen, onOpen }: ProductFormProps) {
                                     onChange={handleChange}
                                     isRequired
                                     validate={() => {
-                                        if (touched.name && errors.name)
-                                            return errors.name;
+                                        if (touched.name && errors.name) return errors.name;
                                     }}
                                 />
 
@@ -128,10 +149,8 @@ function ProductForm({ id, isOpen, onOpen }: ProductFormProps) {
                                         value={values.price}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
-
                                         validate={() => {
-                                            if (errors.price && touched.price)
-                                                return errors.price;
+                                            if (errors.price && touched.price) return errors.price;
                                         }}
                                     />
                                     <Input
@@ -149,13 +168,13 @@ function ProductForm({ id, isOpen, onOpen }: ProductFormProps) {
                                         }}
                                     />
                                     <DateInput
-                                    name="caducityDate"
-                                    label="Caducity Date"
-                                    value={values.caducityDate}
-                                    onChange={(date) => setFieldValue('caducityDate', date)}
-                                    onBlur={handleBlur}
-                                />
-                                {/* {touched.caducityDate && errors.caducityDate && <div className="error">{errors.caducityDate}</div>} */}
+                                        name="caducityDate"
+                                        label="Caducity Date"
+                                        value={values.caducityDate}
+                                        onChange={(date) => setFieldValue("caducityDate", date)}
+                                        onBlur={handleBlur}
+                                    />
+                                    {/* {touched.caducityDate && errors.caducityDate && <div className="error">{errors.caducityDate}</div>} */}
 
                                     <Input
                                         isRequired
@@ -167,8 +186,7 @@ function ProductForm({ id, isOpen, onOpen }: ProductFormProps) {
                                         onBlur={handleBlur}
                                         onChange={handleChange}
                                         validate={() => {
-                                            if (errors.stock && touched.stock)
-                                                return errors.stock;
+                                            if (errors.stock && touched.stock) return errors.stock;
                                         }}
                                     />
 
@@ -180,10 +198,9 @@ function ProductForm({ id, isOpen, onOpen }: ProductFormProps) {
                                         placeholder="0.00"
                                         value={values.weigth}
                                         onBlur={handleBlur}
-                                        onChange={(date) => setFieldValue('caducityDate', date)}    
+                                        onChange={handleChange}
                                         validate={() => {
-                                            if (errors.weigth && touched.weigth)
-                                                return errors.weigth;
+                                            if (errors.weigth && touched.weigth) return errors.weigth;
                                         }}
                                     />
                                     <Input
@@ -199,7 +216,6 @@ function ProductForm({ id, isOpen, onOpen }: ProductFormProps) {
                                                 return errors.measurement;
                                         }}
                                     />
-
                                 </div>
                                 <Input
                                     isRequired
@@ -214,8 +230,26 @@ function ProductForm({ id, isOpen, onOpen }: ProductFormProps) {
                                     }}
                                 />
                                 <ModalFooter className="flex justify-center py-4">
-                                    <Button size="lg" color="danger" onPress={onOpen}>Cancel</Button>
-                                    <Button size="lg" color="success" type="submit" disabled={!isValid || isSubmitting} className="text-white disabled:bg-slate-400">Save</Button>
+                                    {isSubmitting && (
+                                        <div className="flex justify-center">
+                                            <span className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900"></span>
+                                            </div>
+                                            )}
+                                    {errorSaving && (
+                                        <div className="text-red-500 text-center">{errorSaving}</div>
+                                    )}
+                                    <Button size="lg" color="danger" onPress={onOpen}>
+                                        Cancel
+                                    </Button>
+                                    <Button
+                                        size="lg"
+                                        color="success"
+                                        type="submit"
+                                        disabled={!isValid || isSubmitting || isFetching || errorSaving? true : false || id? true : false}
+                                        className="text-white disabled:bg-slate-400"
+                                    >
+                                        Save
+                                    </Button>
                                 </ModalFooter>
                             </Form>
                         )}
@@ -224,7 +258,7 @@ function ProductForm({ id, isOpen, onOpen }: ProductFormProps) {
             </ModalContent>
         </Modal>,
         container
-    )
+    );
 }
 
-export default ProductForm
+export default ProductForm;
