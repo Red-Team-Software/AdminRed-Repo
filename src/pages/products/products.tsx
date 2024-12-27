@@ -7,36 +7,23 @@ import ButtonsPagination from "@/components/buttons-pagination";
 import ProductDetailsPage from "./productDetails";
 import ProductForm from "./productForm";
 import DeleteModal from "@/components/delete-modal";
+import { ModalTarget } from "@/types";
+import useShowList from "@/hooks/use-showlist";
 
-enum ModalTarget {"VIEW", "INSERT", "EDIT", "DELETE"}
 
 export default function ProductsPage() {
 
-  const {products, isLoading, error, page, handlePage, deleteProduct} = useProducts();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalTargetState, setModalTargetState] = useState<ModalTarget>(ModalTarget.VIEW);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { products, isLoading, error, page, handlePage, deleteProduct } = useProducts();
 
-  const handleOpenModal = (target: ModalTarget, id?: string) => {
-    setModalTargetState(target);
-    if (id) {
-      setSelectedProduct(products.find((product) => product.id === id) || null);
-    }
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedProduct(null);
-  };
+  const {isModalOpen, modalTargetState ,selectedItem, handleCloseModal, handleOpenModal } = useShowList<Product>(products);
 
   return (
     <DefaultLayout>
       <section className="flex flex-col items-center py-4 md:py-10">
         
         <div className="container mx-auto text-center justify-center">
-          <h1 className={title()}>Products List Page</h1>
-          <div className="flex items-end justify-end">
+          <div className="flex items-end justify-between">
+            <h1 className={title()}>Products List Page</h1>
             <Button color="success" size="lg" className="text-white" onPress={() => handleOpenModal(ModalTarget.INSERT)}>Add ➕</Button>
           </div>
           
@@ -80,7 +67,7 @@ export default function ProductsPage() {
 
       {isModalOpen && modalTargetState === ModalTarget.VIEW && (
         <ProductDetailsPage
-          id={selectedProduct!.id}
+          id={selectedItem!.id}
           isOpen={isModalOpen}
           onOpen={handleCloseModal}
         />
@@ -97,17 +84,17 @@ export default function ProductsPage() {
         <ProductForm
         isOpen={isModalOpen}
         onOpen={handleCloseModal}
-        id={selectedProduct!.id}
+        id={selectedItem!.id}
       />
       )} 
 
       {isModalOpen && modalTargetState === ModalTarget.DELETE && (
         <DeleteModal
-          title={selectedProduct!.name}
+          title={selectedItem!.name}
           isOpen={isModalOpen}
           onOpen={handleCloseModal}
           onConfirm={() => {
-            deleteProduct(selectedProduct!.id);
+            deleteProduct(selectedItem!.id);
             handleCloseModal();
           }}
         />

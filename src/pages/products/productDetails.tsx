@@ -1,4 +1,3 @@
-
 import {
     Modal,
     ModalContent,
@@ -13,14 +12,11 @@ import {
 } from "@nextui-org/react";
 import ReactDOM from "react-dom";
 import useProductDetail from "@/hooks/products/use-product-details";
+import { DetailsPageProps } from "@/types";
+import { ListboxWrapper } from "@/components/listbox-wrapper";
 
-interface ProductDetailsPageProps {
-    id: string;
-    isOpen: boolean;
-    onOpen: () => void;
-}
 
-export default function ProductDetailsPage({ id, isOpen, onOpen }: ProductDetailsPageProps) {
+export default function ProductDetailsPage({ id, isOpen, onOpen }: DetailsPageProps) {
 
     const { product, isLoading, error } = useProductDetail(id);
 
@@ -63,16 +59,18 @@ export default function ProductDetailsPage({ id, isOpen, onOpen }: ProductDetail
                             </div>
 
                             <h2 className="mt-4 font-bold text-xl">Promotions:</h2>
-                            <Listbox
-                                disallowEmptySelection
-                                aria-label="Promotions"
-                                variant="faded"
-                                //onSelectionChange={setSelectedKeys}
-                            >
-                                {product.promotion.map((item, index) => (
-                                    <ListboxItem key={index} className="bg-slate-400 bg-opacity-40">{item.name} - {item.discount * 100}%</ListboxItem>
-                                ))}
-                            </Listbox>
+                            <ListboxWrapper>
+                                <Listbox
+                                    disallowEmptySelection
+                                    aria-label="Promotions"
+                                    variant="faded"
+                                    //onSelectionChange={setSelectedKeys}
+                                >
+                                    {product.promotion.map((item, index) => (
+                                        <ListboxItem key={index} >{item.name} - {item.discount * 100}%</ListboxItem>
+                                    ))}
+                                </Listbox>
+                            </ListboxWrapper>
                         
 
                 </div>
