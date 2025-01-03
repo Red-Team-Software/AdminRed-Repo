@@ -1,6 +1,5 @@
 {
   "name": "admin-red-repo",
-  "homepage": "https://Red-Team-Software.github.io/AdminRed-Repo",
   "private": true,
   "version": "0.0.0",
   "type": "module",
