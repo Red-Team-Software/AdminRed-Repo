@@ -30,7 +30,6 @@ const useProductDetails = (idProduct: string) => {
     const fetchProduct = async () => {
         setIsLoading(true);
         setError(null);
-
         try {
             const response = await productInstanceApi.get<ProductDetails>('', {
                 params: {
