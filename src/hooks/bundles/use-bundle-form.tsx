@@ -5,10 +5,8 @@ import { Product } from '../products/use-products';
 import { BundleDetails } from './use-bundle-details';
 import { DateValue } from '@nextui-org/react';
 import { parseDate, CalendarDate } from '@internationalized/date';
-import { m } from 'framer-motion';
 
 const apiUrl = import.meta.env.VITE_APIURL;
-
 
 const formatDateForInput = (dateString: string): DateValue => {
     const date = new Date(dateString);

@@ -14,7 +14,6 @@ import { Form, Formik, FormikErrors } from "formik";
 import ReactDOM from "react-dom";
 import { ProductFormValues } from "@/hooks/products/use-product-form"; 
 import { ModalFormProps } from "@/types";
-import { on } from "events";
 
 
 function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {

@@ -1,6 +1,5 @@
 import { Button } from "@nextui-org/button";
-import { Modal, ModalContent, ModalHeader, ModalBody, Spinner, Listbox, ListboxItem, ModalFooter } from "@nextui-org/react";
-import { error } from "console";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/react";
 import ReactDOM from "react-dom";
 
 interface IDeleteModalProps {

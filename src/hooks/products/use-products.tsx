@@ -49,6 +49,7 @@ const useProducts = () => {
     };
 
     const deleteProduct = async (id: string) => {
+        console.log('deleteProduct', id);
         // setIsLoading(true);
         // setError(null);
 

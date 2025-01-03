@@ -49,6 +49,7 @@ const useBundles = () => {
     };
 
     const deleteBundle = async (id: string) => {
+        console.log('deleteBundle', id);
         // setIsLoading(true);
         // setError(null);
 

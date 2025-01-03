@@ -5,7 +5,6 @@ import { ModalFormProps } from '@/types';
 import { Button, Input, Listbox, ListboxItem, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea } from '@nextui-org/react';
 import { Form, Formik, FormikErrors } from 'formik';
 import ReactDOM from 'react-dom';
-import ProductsPage from '../products/products';
 
 function PromotionForm({ id, isOpen, onOpen }: ModalFormProps) {
 

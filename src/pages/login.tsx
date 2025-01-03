@@ -14,7 +14,7 @@ import {
   GithubIcon,
   DiscordIcon,
 } from "@/components/icons";
-import axios, { Axios, AxiosError } from 'axios';
+import axios, { AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 export default function LoginPage() {

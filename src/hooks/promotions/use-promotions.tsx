@@ -49,7 +49,7 @@ const usePromotions = () => {
     };
 
     function deletePromotion(id: string): void {
-
+        console.log('deletePromotion', id);
     }
 
     function handlePage(p: number): void {
