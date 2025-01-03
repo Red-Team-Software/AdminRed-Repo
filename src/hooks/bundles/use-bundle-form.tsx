@@ -5,6 +5,7 @@ import { Product } from '../products/use-products';
 import { BundleDetails } from './use-bundle-details';
 import { DateValue } from '@nextui-org/react';
 import { parseDate, CalendarDate } from '@internationalized/date';
+import { bundleInstanceApi } from '@/api/bundle-instance-api';
 
 const apiUrl = import.meta.env.VITE_APIURL;
 
@@ -12,13 +13,6 @@ const formatDateForInput = (dateString: string): DateValue => {
     const date = new Date(dateString);
     return parseDate(date.toISOString().split('T')[0]);
 };
-
-const axiosInstance = axios.create({
-    baseURL: apiUrl + '/bundle',
-    headers: {
-        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-    },
-});
 
 const axiosInstanceItems = axios.create({
     baseURL: apiUrl + '/product',
@@ -90,7 +84,7 @@ const useBundleForm = (idBundle?: string) => {
                 console.log('update');
                 return;
             } else {
-                const response = await axiosInstance.post('/create', formattedValues);
+                const response = await bundleInstanceApi.post('/create', formattedValues);
                 console.log(response);
             }
         } catch (err: any) {
@@ -107,7 +101,7 @@ const useBundleForm = (idBundle?: string) => {
         setIsLoading(true);
         setError(null);
         try {
-            const response = await axiosInstance.get<BundleDetails>(``, {
+            const response = await bundleInstanceApi.get<BundleDetails>(``, {
                 params: {
                     id: id,
                 },

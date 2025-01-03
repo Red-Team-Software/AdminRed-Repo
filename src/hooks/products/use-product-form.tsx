@@ -1,17 +1,8 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { DateValue } from '@nextui-org/react';
 import { CalendarDate, parseDate } from "@internationalized/date";
 import { ProductDetails } from './use-product-details';
-
-const apiUrl = import.meta.env.VITE_APIURL;
-
-const axiosInstance = axios.create({
-    baseURL: apiUrl + '/product',
-    headers: {
-        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-    },
-});
+import { productInstanceApi } from '@/api/product-instance-api';
 
 
 const formatDateForInput = (dateString: string): DateValue => {
@@ -88,7 +79,7 @@ const useProductForm = (idProduct?: string) => {
                 console.log('update');
                 return;
             } else {
-                const response = await axiosInstance.post('/create', formData);
+                const response = await productInstanceApi.post('/create', formData);
                 console.log(response);
             }
         } catch (err: any) {
@@ -105,7 +96,7 @@ const useProductForm = (idProduct?: string) => {
         setError(null);
 
         try {
-            const response = await axiosInstance.get<ProductDetails>(``, {
+            const response = await productInstanceApi.get<ProductDetails>(``, {
                 params: {
                     id: id,
                 },

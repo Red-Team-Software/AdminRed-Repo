@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { promotionInstanceApi } from '@/api/promotion-instance-api';
 import { useEffect, useState } from 'react';
 
 export interface Promotion {
@@ -12,16 +12,6 @@ export interface Promotion {
     categories: string[];
 }
 
-
-const apiUrl = import.meta.env.VITE_APIURL;
-
-const axiosInstance = axios.create({
-    baseURL: apiUrl + '/promotion',
-    headers: {
-        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-    },
-});
-
 const usePromotions = () => {
 
     const [promotions, setPromotions] = useState<Promotion[]>([]);
@@ -34,7 +24,7 @@ const usePromotions = () => {
         setError(null);
 
         try {
-            const response = await axiosInstance.get<Promotion[]>('/all',{
+            const response = await promotionInstanceApi.get<Promotion[]>('/all',{
                 params: {
                     page,
                     perPage: 10,

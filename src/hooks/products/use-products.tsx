@@ -1,15 +1,5 @@
+import { productInstanceApi } from '@/api/product-instance-api';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
-
-
-const apiUrl = import.meta.env.VITE_APIURL;
-
-const axiosInstance = axios.create({
-    baseURL: apiUrl + '/product',
-    headers: {
-        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-    },
-});
 
 export interface Product {
     id: string;
@@ -31,7 +21,7 @@ const useProducts = () => {
         setError(null);
 
         try {
-            const response = await axiosInstance<Product[]>('/all', {
+            const response = await productInstanceApi<Product[]>('/all', {
                 params: {
                     page,
                     perPage: 10,

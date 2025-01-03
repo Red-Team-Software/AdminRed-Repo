@@ -1,18 +1,7 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Item } from '@/types';
+import { bundleInstanceApi } from '@/api/bundle-instance-api';
 
-
-const apiUrl = import.meta.env.VITE_APIURL;
-
-const axiosInstance = axios.create({
-    baseURL: apiUrl,
-    // timeout: 1000,
-    headers: {
-        // 'Content-Type': 'application/json',
-        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-    },
-});
 
 interface IPromotions {
     id: string;
@@ -34,7 +23,6 @@ export interface BundleDetails {
     categories: [];
     promotion: IPromotions[];
     products: Item[];
-
 }
 
 const useBundleDetails = (idBundle: string) => {
@@ -47,7 +35,7 @@ const useBundleDetails = (idBundle: string) => {
         setError(null);
 
         try {
-            const response = await axiosInstance.get<BundleDetails>('/bundle', {
+            const response = await bundleInstanceApi.get<BundleDetails>('', {
                 params: {
                     id: idBundle,
                 },

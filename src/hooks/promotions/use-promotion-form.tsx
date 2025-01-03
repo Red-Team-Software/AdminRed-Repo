@@ -3,18 +3,10 @@ import axios from 'axios';
 import { Item } from '@/types';
 import { IPromotionsDetails } from './use-promotions-details';
 import { Product } from '../products/use-products';
-
-const apiUrl = import.meta.env.VITE_APIURL;
-
-const axiosInstance = axios.create({
-    baseURL: apiUrl + '/promotion',
-    headers: {
-        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-    },
-});
+import { promotionInstanceApi } from '@/api/promotion-instance-api';
 
 const axiosInstanceItems = axios.create({
-    baseURL: apiUrl,
+    baseURL: import.meta.env.VITE_APIURL,
     headers: {
         Authorization: `Bearer ${sessionStorage.getItem('token')}`,
     },
@@ -82,7 +74,7 @@ const usePromotionForm = (idPromotion?: string) => {
                 console.log('update');
                 return;
             } else {
-                const response = await axiosInstance.post('/create', formattedValues);
+                const response = await promotionInstanceApi.post('/create', formattedValues);
                 console.log(response);
             }
         } catch (err: any) {
@@ -99,7 +91,7 @@ const usePromotionForm = (idPromotion?: string) => {
         setIsLoading(true);
         setError(null);
         try {
-            const response = await axiosInstance.get<IPromotionsDetails>(``, {
+            const response = await promotionInstanceApi.get<IPromotionsDetails>(``, {
                 params: {
                     id: id,
                 },

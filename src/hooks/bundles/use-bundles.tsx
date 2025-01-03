@@ -1,15 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
-
-
-const apiUrl = import.meta.env.VITE_APIURL;
-
-const axiosInstance = axios.create({
-    baseURL: apiUrl + '/bundle',
-    headers: {
-        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-    },
-});
+import { bundleInstanceApi } from '@/api/bundle-instance-api';
 
 export interface Bundle {
     id: string;
@@ -31,7 +21,7 @@ const useBundles = () => {
         setError(null);
 
         try {
-            const response = await axiosInstance<Bundle[]>('/all', {
+            const response = await bundleInstanceApi<Bundle[]>('/all', {
                 params: {
                     page,
                     perPage: 10,
