@@ -48,6 +48,10 @@ const usePromotions = () => {
         }
     };
 
+    function deletePromotion(id: string): void {
+
+    }
+
     function handlePage(p: number): void {
         if(p > 0 && p != page){
             setPage(p);
@@ -58,7 +62,7 @@ const usePromotions = () => {
         fetchPromotions();
     }, [page]);
 
-    return { promotions, page, isLoading, error, handlePage };
+    return { promotions, page, isLoading, error, handlePage, deletePromotion };
 };
 
 export default usePromotions;

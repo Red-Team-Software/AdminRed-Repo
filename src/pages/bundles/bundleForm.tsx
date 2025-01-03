@@ -1,24 +1,15 @@
-import useProductForm from "@/hooks/products/use-product-form";
-import {
-    Modal,
-    ModalBody,
-    ModalContent,
-    ModalHeader,
-    Input,
-    Button,
-    Textarea,
-    ModalFooter,
-    DateInput,
-} from "@nextui-org/react";
-import { Form, Formik, FormikErrors } from "formik";
-import ReactDOM from "react-dom";
-import { ProductFormValues } from "@/hooks/products/use-product-form"; 
-import { ModalFormProps } from "@/types";
-import { on } from "events";
+import ButtonsPagination from '@/components/buttons-pagination';
+import { ListboxWrapper } from '@/components/listbox-wrapper';
+import useBundleForm, { BundleFormValues } from '@/hooks/bundles/use-bundle-form';
+import { ModalFormProps } from '@/types'
+import { Button } from '@nextui-org/button';
+import { Textarea } from '@nextui-org/input';
+import { Modal, ModalContent, ModalHeader, ModalBody, DateInput, ModalFooter, Input, Listbox, ListboxItem, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow} from '@nextui-org/react';
+import { Formik, FormikErrors, Form } from 'formik';
+import ReactDOM from 'react-dom';
 
-
-function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
-    const { initialProduct, isFetching, errorSaving, saveProductApi } = useProductForm(id);
+function BundleForm({ id, isOpen, onOpen }: ModalFormProps) {
+    const { initialBundle, isFetching, errorSaving, saveBundleApi, itemsFetched, page, handlePage  } = useBundleForm(id);
 
     const handleFileChange = (
         event: React.ChangeEvent<HTMLInputElement>,
@@ -32,16 +23,17 @@ function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
 
     const container = document.getElementById("overlays") as HTMLElement;
     return ReactDOM.createPortal(
+
         <Modal isOpen={isOpen} scrollBehavior="inside" size="4xl" onClose={onOpen}>
             <ModalContent>
-                <ModalHeader className="flex justify-center">{id ? "Edit" : "Create"} Product Form</ModalHeader>
+                <ModalHeader className="flex justify-center">{id ? "Edit" : "Create"} Bundle Form</ModalHeader>
                 
                 <ModalBody>
                     <Formik
                         enableReinitialize={true}
-                        initialValues={initialProduct}
+                        initialValues={initialBundle}
                         validate={(values) => {
-                            const errors: FormikErrors<ProductFormValues> = {};
+                            const errors: FormikErrors<BundleFormValues> = {};
                             if (
                                 !values.name ||
                                 values.name.trim() === "" ||
@@ -80,13 +72,19 @@ function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
                                 errors.images = "Required";
                             }
 
+                            if ( values.products.length < 2 ) {
+                                errors.products = "Required at least 2 products";
+                            }
+
                             return errors;
                         }}
+
                         onSubmit={async (values, { setSubmitting }) => {
                             setSubmitting(true);
                             
-                            // console.log(values);
-                            await saveProductApi(values, id);
+                            console.log(values);
+                            await saveBundleApi(values, id);
+
                             setSubmitting(false);
                             if (!errorSaving) {
                                 onOpen();
@@ -110,7 +108,7 @@ function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
                                     type="text"
                                     name="name"
                                     label="Name"
-                                    placeholder="Enter product name"
+                                    placeholder="Enter Bundle name"
                                     value={values.name}
                                     onBlur={handleBlur}
                                     onChange={handleChange}
@@ -124,7 +122,7 @@ function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
                                     isRequired
                                     name="description"
                                     label="Description"
-                                    placeholder="Enter product description"
+                                    placeholder="Enter Bundle description"
                                     value={values.description}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
@@ -228,6 +226,61 @@ function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
                                             return errors.images.toString();
                                     }}
                                 />
+
+                                
+                            <div className='flex justify-between items-start m-8'>
+                                    <div className="w-1/2">
+                                        <h2 className="mt-4 font-bold">Products Selected:</h2>
+                                        <ListboxWrapper>
+                                            <Listbox
+                                                disallowEmptySelection
+                                                aria-label="items"
+                                                variant="faded"
+                                            >
+                                                {values.products.map((item, index) => (
+                                                    <ListboxItem key={index} onDoubleClick={() => setFieldValue('products', values.products.filter((_, i) => i !== index))}>{item.name}</ListboxItem>
+                                                ))}
+                                            </Listbox>
+                                        </ListboxWrapper>
+
+                                        {errors.products && (
+                                            <div className="text-red-500">{Array.isArray(errors.products) ? errors.products.join(', ') : errors.products}</div>
+                                        )}
+                                        <p className="text-sm text-gray-500 mt-4">Double click to remove item</p>
+                                    </div>
+
+                                    <div className="w-1/2">
+                                        <Table removeWrapper aria-label="item list" >
+                                            <TableHeader>
+                                                <TableColumn>NAME</TableColumn>
+                                                <TableColumn>ACTION</TableColumn>
+                                            </TableHeader>
+                                            {isFetching ? (
+                                                <TableBody emptyContent={"loading..."}>{[]}</TableBody>
+                                            ) : errorSaving ? (
+                                                <TableBody emptyContent={`Error: ${errorSaving}`}>{[]}</TableBody>
+                                            ) : itemsFetched && itemsFetched.length > 0 ? (
+                                                <TableBody>
+                                                    {itemsFetched.map((item) => (
+                                                        <TableRow key={item.id}>
+                                                            <TableCell>{item.name}</TableCell>
+                                                            <TableCell className="flex gap-1 items-center">
+                                                                <Button color="primary" size="sm" variant="flat" 
+                                                                    onPress={() => {
+                                                                        if (values.products.find((p) => p.id === item.id)) return;
+                                                                        setFieldValue('products', [...values.products, item])
+                                                                    }}>Select
+                                                                </Button>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ))}
+                                                </TableBody>
+                                            ) : <TableBody emptyContent={`No items to show`}>{[]}</TableBody>}
+                                        </Table>
+                                        <ButtonsPagination currentPage={page} isLastPage={itemsFetched.length < 7} handlePage={handlePage} />
+                                    </div>
+                                </div>
+
                                 <ModalFooter className="flex justify-center py-4">
                                     {isSubmitting && (
                                         <div className="flex justify-center">
@@ -260,4 +313,4 @@ function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
     );
 }
 
-export default ProductForm;
+export default BundleForm

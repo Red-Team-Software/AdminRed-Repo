@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { title } from "@/components/primitives";
 import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Button } from "@nextui-org/react";
 import useProducts, { Product } from "@/hooks/products/use-products";
@@ -45,7 +44,7 @@ export default function ProductsPage() {
                       <TableCell>{product.name}</TableCell>
                       <TableCell>{product.price} $</TableCell>
                       <TableCell>{product.currency}</TableCell>
-                      <TableCell className="flex gap-1 justify-center items-center">
+                      <TableCell className="flex gap-1 items-center">
                         <Button color="primary" size="sm"  variant="flat" onPress={() => handleOpenModal(ModalTarget.VIEW, product.id)}>View</Button>
                         <Button color="warning" size="sm" variant="flat" onPress={() => handleOpenModal(ModalTarget.EDIT, product.id)}>Edit</Button>
                         <Button color="danger" size="sm" variant="flat" onPress={() => handleOpenModal(ModalTarget.DELETE, product.id)}>Delete</Button>

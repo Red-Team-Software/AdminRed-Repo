@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Item } from '@/types';
 
 
 const apiUrl = import.meta.env.VITE_APIURL;
@@ -19,7 +20,7 @@ interface IPromotions {
     discount: number;
 }
 
-export interface ProductDetails {
+export interface BundleDetails {
     id: string;
     description: string;
     caducityDate: string;
@@ -32,25 +33,27 @@ export interface ProductDetails {
     measurement: string;
     categories: [];
     promotion: IPromotions[];
+    products: Item[];
+
 }
 
-const useProductDetails = (idProduct: string) => {
-    const [product, setProduct] = useState<ProductDetails>();
+const useBundleDetails = (idBundle: string) => {
+    const [bundle, setBundle] = useState<BundleDetails>();
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchProduct = async () => {
+    const fetchBundle = async () => {
         setIsLoading(true);
         setError(null);
 
         try {
-            const response = await axiosInstance.get<ProductDetails>('/product', {
+            const response = await axiosInstance.get<BundleDetails>('/bundle', {
                 params: {
-                    id: idProduct,
+                    id: idBundle,
                 },
             }
             );
-            setProduct(response.data);
+            setBundle(response.data);
         } catch (err: any) {
             setError(err.message);
         } finally {
@@ -61,14 +64,14 @@ const useProductDetails = (idProduct: string) => {
     useEffect(() => {
         const token = sessionStorage.getItem('token');
         if (token) {
-            fetchProduct();
+            fetchBundle();
         } else {
             setError('No token found');
         }
     }, []);
 
 
-    return { product, isLoading, error };
+    return { bundle, isLoading, error };
 };
 
-export default useProductDetails;
+export default useBundleDetails;

@@ -6,10 +6,12 @@ import DefaultLayout from "@/layouts/default";
 import { Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@nextui-org/react";
 import useShowList from "@/hooks/use-showlist";
 import PromotionDetailsPage from "./promotionsDetails";
+import DeleteModal from "@/components/delete-modal";
+import PromotionForm from "./promotionForm";
 
 function PromotionsPage() {
 
-    const { promotions, isLoading, error, page, handlePage } = usePromotions();
+    const { promotions, isLoading, error, page, handlePage, deletePromotion } = usePromotions();
 
     const { isModalOpen, modalTargetState, selectedItem, handleCloseModal, handleOpenModal } = useShowList<Promotion>(promotions);
     
@@ -20,7 +22,7 @@ function PromotionsPage() {
                 <div className="container mx-auto text-center justify-center">
                     <div className="flex items-end justify-between">
                         <h1 className={title()}>Promotions List Page</h1>
-                        <Button color="success" size="md" className="text-white" onPress={() =>{}}>Add ➕</Button>
+                        <Button color="success" size="md" className="text-white" onPress={() =>{handleOpenModal(ModalTarget.INSERT)}}>Add ➕</Button>
                     </div>
 
                     <Table isStriped aria-label="promotion list" className="my-8 w-full">
@@ -38,10 +40,10 @@ function PromotionsPage() {
                             <TableBody>
                                 {promotions.map((prom) => (
                                     <TableRow key={prom.id}>
-                                        <TableCell className="text-center">{prom.name}</TableCell>
-                                        <TableCell className="text-center">{ prom.avaleableState? 'Si' : 'No' }</TableCell>
-                                        <TableCell className="text-center">{prom.discount}</TableCell>
-                                        <TableCell className="flex gap-1 justify-center items-center text-center">
+                                        <TableCell>{prom.name}</TableCell>
+                                        <TableCell>{ prom.avaleableState? 'Si' : 'No' }</TableCell>
+                                        <TableCell>{prom.discount * 100} %</TableCell>
+                                        <TableCell className="flex gap-1 items-center">
                                             <Button color="primary" size="sm" variant="flat" onPress={() => handleOpenModal(ModalTarget.VIEW, prom.id)}>View</Button>
                                             <Button color="warning" size="sm" variant="flat" onPress={() => handleOpenModal(ModalTarget.EDIT, prom.id)}>Edit</Button>
                                             <Button color="danger" size="sm" variant="flat" onPress={() => handleOpenModal(ModalTarget.DELETE, prom.id)}>Delete</Button>
@@ -69,13 +71,14 @@ function PromotionsPage() {
                 />
             )}
 
-            {/*{isModalOpen && modalTargetState === ModalTarget.INSERT && (
-                <ProductForm
+            {isModalOpen && modalTargetState === ModalTarget.INSERT && (
+                <PromotionForm
                     isOpen={isModalOpen}
                     onOpen={handleCloseModal}
                 />
             )}
 
+            {/*
             {isModalOpen && modalTargetState === ModalTarget.EDIT && (
                 <ProductForm
                     isOpen={isModalOpen}
@@ -83,18 +86,19 @@ function PromotionsPage() {
                     id={selectedProduct!.id}
                 />
             )}
+            */}
 
             {isModalOpen && modalTargetState === ModalTarget.DELETE && (
                 <DeleteModal
-                    title={selectedProduct!.name}
+                    title={selectedItem!.name}
                     isOpen={isModalOpen}
                     onOpen={handleCloseModal}
                     onConfirm={() => {
-                        deleteProduct(selectedProduct!.id);
+                        deletePromotion(selectedItem!.id);
                         handleCloseModal();
                     }}
                 />
-            )} */}
+            )} 
 
         </DefaultLayout>
     )

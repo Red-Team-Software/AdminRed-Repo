@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Item } from '@/types';
 
 
 const apiUrl = import.meta.env.VITE_APIURL;
@@ -15,15 +16,10 @@ export interface IPromotionsDetails {
     categories:     Item[];
 }
 
-interface Item {
-    id:   string;
-    name: string;
-}
-
 
 const axiosInstance = axios.create({
     baseURL: apiUrl + '/promotion',
-    timeout: 1000,
+    // timeout: 1000,
     headers: {
         // 'Content-Type': 'application/json',
         Authorization: `Bearer ${sessionStorage.getItem('token')}`,

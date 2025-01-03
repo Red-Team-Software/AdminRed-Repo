@@ -11,3 +11,14 @@ export interface DetailsPageProps {
   isOpen: boolean;
   onOpen: () => void;
 }
+
+export interface ModalFormProps {
+  id?: string;
+  isOpen: boolean;
+  onOpen: () => void;
+}
+
+export interface Item {
+  id:   string;
+  name: string;
+}
