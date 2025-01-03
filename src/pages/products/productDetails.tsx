@@ -14,6 +14,7 @@ import ReactDOM from "react-dom";
 import useProductDetail from "@/hooks/products/use-product-details";
 import { DetailsPageProps } from "@/types";
 import { ListboxWrapper } from "@/components/listbox-wrapper";
+import { subtitle, title } from "@/components/primitives";
 
 
 export default function ProductDetailsPage({ id, isOpen, onOpen }: DetailsPageProps) {
@@ -25,7 +26,7 @@ export default function ProductDetailsPage({ id, isOpen, onOpen }: DetailsPagePr
 
         <Modal isOpen={isOpen} scrollBehavior="inside" size="4xl" onClose={onOpen} >
             <ModalContent>
-                <ModalHeader className="flex justify-center">Product Details</ModalHeader>
+                <ModalHeader className={`${title({ size: "sm" })} text-center`}>Product Details</ModalHeader>
                 <ModalBody>
                     {isLoading ? (
                         <Spinner size="lg" color="warning" label="Loading..." />
@@ -33,55 +34,55 @@ export default function ProductDetailsPage({ id, isOpen, onOpen }: DetailsPagePr
                         <p>Error: {error}</p>
                     ) : product ? (
                         <div>
-                            <h1 className="uppercase text-center font-bold text-purple-600 text-3xl">{product.name}</h1>
+                            <h1 className={`${title({ size: "md", color: "yellow" })} uppercase flex justify-center p-2`}>{product.name}</h1>
                             <div className="m-4 flex gap-4 justify-center">
                                 {product.images.map((image, index) => (
                                     <Image key={index} src={image} alt={product.name} width={200} height={200} />
                                 ))}
                             </div>
 
-                            <h2 className="mt-4 font-bold text-xl">Description:</h2>
+                            <h2 className={subtitle()}>Description:</h2>
                             <p>{product.description}</p>
 
-                            <div className="mt-2 flex gap-4 items-end font-bold text-xl">
-                                <h2>Price:</h2>
-                                <p className="text-3xl text-purple-600">{product.price} {product.currency}</p>
+                            <div className="mt-4 flex gap-4 items-end">
+                                <h2 className="text-lg lg:text-xl text-default-600 block">Price:</h2>
+                                <p className={title({ size: "sm", color: "yellow" })}>{product.price} {product.currency}</p>
                             </div>
 
-                            <div className="mt-2 flex gap-4 items-end font-bold text-xl">
-                                <h2>In Stock:</h2>
-                                <p className="text-3xl text-purple-600">{product.stock}</p>
+                            <div className="mt-4 flex gap-4 items-end">
+                                <h2 className="text-lg lg:text-xl text-default-600 block">In Stock:</h2>
+                                <p className={title({ size: "sm", color: "yellow" })}>{product.stock}</p>
                             </div>
 
-                            <div className="mt-2 flex gap-4 items-end font-bold text-xl">
-                                <h2>Weight:</h2>
-                                <p className="text-3xl text-purple-600">{product.weigth} {product.measurement}</p>
+                            <div className="my-4 flex gap-4 items-end">
+                                <h2 className="text-lg lg:text-xl text-default-600 block">Weight:</h2>
+                                <p className={title({ size: "sm", color: "yellow" })}>{product.weigth} {product.measurement}</p>
                             </div>
 
-                            <h2 className="mt-4 font-bold text-xl">Promotions:</h2>
+                            <h2 className={subtitle()}>Promotions:</h2>
                             <ListboxWrapper>
                                 <Listbox
                                     disallowEmptySelection
                                     aria-label="Promotions"
                                     variant="faded"
-                                    //onSelectionChange={setSelectedKeys}
+                                //onSelectionChange={setSelectedKeys}
                                 >
                                     {product.promotion.map((item, index) => (
                                         <ListboxItem key={index} >{item.name} - {item.discount * 100}%</ListboxItem>
                                     ))}
                                 </Listbox>
                             </ListboxWrapper>
-                        
 
-                </div>
-                ) : (
-                <p>No product found</p>
+
+                        </div>
+                    ) : (
+                        <p>No product found</p>
                     )}
-            </ModalBody>
-            <ModalFooter>
-                <Button color="secondary" onClick={onOpen}>Close</Button>
-            </ModalFooter>
-        </ModalContent>
+                </ModalBody>
+                <ModalFooter>
+                    <Button color="default" variant="flat" onClick={onOpen}>Close</Button>
+                </ModalFooter>
+            </ModalContent>
         </Modal >,
         container
     );

@@ -1,5 +1,6 @@
 import ButtonsPagination from '@/components/buttons-pagination';
 import { ListboxWrapper } from '@/components/listbox-wrapper';
+import { title } from '@/components/primitives';
 import usePromotionForm, { PromotionFormValues } from '@/hooks/promotions/use-promotion-form';
 import { ModalFormProps } from '@/types';
 import { Button, Input, Listbox, ListboxItem, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea } from '@nextui-org/react';
@@ -16,8 +17,7 @@ function PromotionForm({ id, isOpen, onOpen }: ModalFormProps) {
     return ReactDOM.createPortal(
         <Modal isOpen={isOpen} scrollBehavior="inside" size="4xl" onClose={onOpen}>
             <ModalContent>
-                <ModalHeader className="flex justify-center">{id ? "Edit" : "Create"} Promotion Form</ModalHeader>
-
+                <ModalHeader className={`${title({ size: "sm" })} text-center`}>{id ? "Edit" : "Create"} Promotion Form</ModalHeader>
                 <ModalBody>
                     <Formik
                         enableReinitialize={true}

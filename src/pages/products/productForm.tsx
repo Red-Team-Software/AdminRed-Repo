@@ -12,8 +12,9 @@ import {
 } from "@nextui-org/react";
 import { Form, Formik, FormikErrors } from "formik";
 import ReactDOM from "react-dom";
-import { ProductFormValues } from "@/hooks/products/use-product-form"; 
+import { ProductFormValues } from "@/hooks/products/use-product-form";
 import { ModalFormProps } from "@/types";
+import { title } from "@/components/primitives";
 
 
 function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
@@ -33,8 +34,7 @@ function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
     return ReactDOM.createPortal(
         <Modal isOpen={isOpen} scrollBehavior="inside" size="4xl" onClose={onOpen}>
             <ModalContent>
-                <ModalHeader className="flex justify-center">{id ? "Edit" : "Create"} Product Form</ModalHeader>
-                
+                <ModalHeader className={`${title({ size: "sm" })} text-center`}>{id ? "Edit" : "Create"} Product Form</ModalHeader>
                 <ModalBody>
                     <Formik
                         enableReinitialize={true}
@@ -83,7 +83,7 @@ function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
                         }}
                         onSubmit={async (values, { setSubmitting }) => {
                             setSubmitting(true);
-                            
+
                             // console.log(values);
                             await saveProductApi(values, id);
                             setSubmitting(false);
@@ -104,7 +104,7 @@ function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
                             setFieldValue,
                         }) => (
                             <Form onSubmit={handleSubmit} className="flex flex-col gap-3">
-                                
+
                                 <Input
                                     type="text"
                                     name="name"
@@ -231,8 +231,8 @@ function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
                                     {isSubmitting && (
                                         <div className="flex justify-center">
                                             <span className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900"></span>
-                                            </div>
-                                            )}
+                                        </div>
+                                    )}
                                     {errorSaving && (
                                         <div className="text-red-500 text-center">{errorSaving}</div>
                                     )}
@@ -243,7 +243,7 @@ function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
                                         size="lg"
                                         color="success"
                                         type="submit"
-                                        disabled={!isValid || isSubmitting || isFetching || errorSaving? true : false || id? true : false}
+                                        disabled={!isValid || isSubmitting || isFetching || errorSaving ? true : false || id ? true : false}
                                         className="text-white disabled:bg-slate-400"
                                     >
                                         Save

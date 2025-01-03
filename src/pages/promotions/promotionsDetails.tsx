@@ -1,4 +1,5 @@
 import { ListboxWrapper } from "@/components/listbox-wrapper";
+import { subtitle, title } from "@/components/primitives";
 import usePromotionDetails from "@/hooks/promotions/use-promotions-details";
 import { DetailsPageProps } from "@/types";
 import {
@@ -24,7 +25,8 @@ export default function ProductDetailsPage({ id, isOpen, onOpen }: DetailsPagePr
 
         <Modal isOpen={isOpen} scrollBehavior="inside" size="2xl" onClose={onOpen} >
             <ModalContent>
-                <ModalHeader className="flex justify-center">Product Details</ModalHeader>
+            <ModalHeader className={`${title({ size: "sm" })} text-center`}>Promotion Details</ModalHeader>
+
                 <ModalBody>
                     {isLoading ? (
                         <Spinner size="lg" color="warning" label="Loading..." />
@@ -32,17 +34,17 @@ export default function ProductDetailsPage({ id, isOpen, onOpen }: DetailsPagePr
                         <p>Error: {error}</p>
                     ) : promotion ? (
                         <div>
-                            <h1 className="uppercase text-center font-bold text-purple-600 text-3xl">{promotion.name}</h1>
+                            <h1 className={`${title({size:"md", color:"yellow"})} uppercase flex justify-center p-2`}>{promotion.name}</h1>
 
-                            <h2 className="mt-4 font-bold text-xl">Description:</h2>
+                            <h2 className={subtitle()}>Description:</h2>
                             <p>{promotion.description}</p>
-
-                            <div className="mt-2 flex gap-4 items-end font-bold text-xl">
-                                <h2>Porcentaje:</h2>
-                                <p className="text-3xl text-purple-600">{promotion.discount * 100} %</p>
+                            
+                            <div className="mt-4 flex gap-4 items-end">
+                                <h2 className="text-lg lg:text-xl text-default-600 block">Porcentaje:</h2>
+                                <p className={title({size:"sm", color:"yellow"})}>{promotion.discount * 100} %</p>
                             </div>
 
-                            <h2 className="mt-4 font-bold text-xl">Products:</h2>
+                            <h2 className={subtitle()}>Products:</h2>
                             <ListboxWrapper>
                                 <Listbox
                                     disallowEmptySelection
@@ -56,7 +58,7 @@ export default function ProductDetailsPage({ id, isOpen, onOpen }: DetailsPagePr
                                 </Listbox>
                             </ListboxWrapper>
 
-                            <h2 className="mt-4 font-bold text-xl">Bundles:</h2>
+                            <h2 className={subtitle()}>Bundles:</h2>
                             <ListboxWrapper>
                                 <Listbox
                                     disallowEmptySelection
@@ -72,7 +74,7 @@ export default function ProductDetailsPage({ id, isOpen, onOpen }: DetailsPagePr
                                 </Listbox>
                             </ListboxWrapper>
 
-                            <h2 className="mt-4 font-bold text-xl">Categories:</h2>
+                            <h2 className={subtitle()}>Categories:</h2>
                             <ListboxWrapper>
                                 <Listbox
                                     disallowEmptySelection
@@ -93,7 +95,7 @@ export default function ProductDetailsPage({ id, isOpen, onOpen }: DetailsPagePr
                     )}
                 </ModalBody>
                 <ModalFooter>
-                    <Button color="secondary" onClick={onOpen}>Close</Button>
+                    <Button color="default" variant="flat" onClick={onOpen}>Close</Button>
                 </ModalFooter>
             </ModalContent>
         </Modal >,
