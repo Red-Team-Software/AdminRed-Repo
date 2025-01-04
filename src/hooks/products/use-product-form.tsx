@@ -39,12 +39,15 @@ const useProductForm = (idProduct?: string) => {
     });
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isError, setIsError] = useState<boolean>(false);
+
     const [error, setError] = useState<string | null>(null);
 
 
     const saveProduct = async (product: ProductFormValues, id?: string) => {
         setIsLoading(true);
         setError(null);
+        setIsError(false);
 
         const formattedValues = {
             ...product,
@@ -84,6 +87,7 @@ const useProductForm = (idProduct?: string) => {
             }
         } catch (err: any) {
             console.log(err);
+            setIsError(true);
             setError('Error saving product: ' + err.response.data.message,);
         } finally {
             setIsLoading(false);
@@ -94,6 +98,7 @@ const useProductForm = (idProduct?: string) => {
 
         setIsLoading(true);
         setError(null);
+        setIsError(false);
 
         try {
             const response = await productInstanceApi.get<ProductDetails>(``, {
@@ -117,6 +122,7 @@ const useProductForm = (idProduct?: string) => {
             });
         } catch (err: any) {
             console.error(err);
+            setIsError(true);
             setError(err.message);
         } finally {
             setIsLoading(false);
@@ -136,7 +142,7 @@ const useProductForm = (idProduct?: string) => {
     }, []);
 
 
-    return { initialProduct, isFetching: isLoading, errorSaving: error, saveProductApi: saveProduct };
-};
+    return { initialProduct, isFetching: isLoading, errorSaving: error, isErrorSaving: isError, saveProductApi: saveProduct };
+}; 
 
 export default useProductForm;

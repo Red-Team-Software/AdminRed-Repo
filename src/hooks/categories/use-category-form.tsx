@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Item } from '@/types';
-import { IPromotionsDetails } from './use-promotions-details';
 import { Product } from '../products/use-products';
-import { promotionInstanceApi } from '@/api/promotion-instance-api';
+import { categoryInstanceApi } from '@/api/category-instance-api';
+import { CategoryDetails } from './use-category-details';
 
 const axiosInstanceItems = axios.create({
     baseURL: import.meta.env.VITE_APIURL,
@@ -12,109 +12,90 @@ const axiosInstanceItems = axios.create({
     },
 });
 
-export interface PromotionFormValues {
+export interface CategoryFormValues {
     id?: string;
-    description: string;
     name: string;
-    avaleableState: string;
-    discount: string;
+    image: File;
     products: Item[];
     bundles: Item[];
     // categories: Item[];
 }
 
-const usePromotionForm = (idPromotion?: string) => {
+const useCategoryForm = (idCategory?: string) => {
 
-    const [initialPromotion, setInitialPromotion] = useState<PromotionFormValues>({
+    const [initialCategory, setInitialCategory] = useState<CategoryFormValues>({
         name: "",
-        description: "",
-        avaleableState: "YES",
-        discount: "5",
+        image: new File([], ''),
         products: [],
         bundles: [],
-        // categories: [],
     });
 
     const ItemsTypeList: Item[] = [
         { id: '1', name: 'Products' },
         { id: '2', name: 'Bundles' },
-        { id: '3', name: 'Categories' },
     ]
 
     const [ isLoading, setIsLoading ] = useState<boolean>(false);
     const [ isError, setIsError ] = useState<boolean>(false);
-
     const [ error, setError ] = useState<string | null>(null);
     const [ itemType, setItemType ] = useState<Item>(ItemsTypeList[0]);
     const [ itemsFetched, setItemsFetched ] = useState<Item[]>([]);
     const [ page, setPage ] = useState<number>(1);
 
 
-    const savePromotion = async (promotion: PromotionFormValues, id?: string) => {
+    const saveCategory = async (category: CategoryFormValues, id?: string ) => {
         setIsLoading(true);
-        setError(null);
         setIsError(false);
+        setError(null);
 
-        const formattedValues: any = {
-            name: promotion.name,
-            description: promotion.description,
-            avaleableState: promotion.avaleableState === 'YES' ? true : false,
-            discount: parseFloat(promotion.discount) / 100,
-        };
+        const formData = new FormData();
+        formData.append('name', category.name);
+        formData.append('image', category.image);
+        formData.append('productos', category.products.map((product) => product.id).join(','));
+        // formData.append('bundles', JSON.stringify(category.bundles));
 
-        if (promotion.products.length > 0) {
-            formattedValues.products = promotion.products.map((item) => item.id);
-        }
-
-        if (promotion.bundles.length > 0) {
-            formattedValues.bundles = promotion.bundles.map((item) => item.id);
-        }
-
-        console.log('formData', formattedValues);
+        console.log('formData', formData);
 
         try {
             if (id) {
                 console.log('update');
                 return;
             } else {
-                const response = await promotionInstanceApi.post('/create', formattedValues);
+                const response = await categoryInstanceApi.post('/create', formData);
                 console.log(response);
             }
         } catch (err: any) {
             console.log(err);
             setIsError(true);
-            setError('Error saving product: ' + err.response.data.message,);
+            setError('Error saving category: ' + err.response.data.message,);
         } finally {
             setIsLoading(false);
         }
     }
 
 
-    const _getPromotionToEdit = async (id: string) => {
+    const _getCategoryToEdit = async (id: string) => {
 
         setIsLoading(true);
         setError(null);
         setIsError(false);
         try {
-            const response = await promotionInstanceApi.get<IPromotionsDetails>(``, {
+            const response = await categoryInstanceApi.get<CategoryDetails>(``, {
                 params: {
                     id: id,
                 },
             });
-            setInitialPromotion({
+            setInitialCategory({
                 id: response.data.id,
                 name: response.data.name,
-                description: response.data.description,
-                avaleableState: response.data.avaleableState ? 'YES' : 'NO',
-                discount: response.data.discount.toString(),
+                image: new File([], ''),
                 products: response.data.products,
-                bundles: response.data.bundles,
-                // categories: response.data.categories,
+                bundles: [],
             });
         } catch (err: any) {
             console.error(err);
-            setIsError(true);
             setError(err.message);
+            setIsError(true);
         } finally {
             setIsLoading(false);
         }
@@ -132,6 +113,7 @@ const usePromotionForm = (idPromotion?: string) => {
         setIsLoading(true);
         setError(null);
         setIsError(false);
+
         try {
             if (!itemType) {
                 return;
@@ -155,15 +137,6 @@ const usePromotionForm = (idPromotion?: string) => {
             }
             if (itemId === '2') {
             //     const response = await axiosInstanceItems.get<Item[]>('/bundle/all', {
-            //         params: {
-            //             page,
-            //             perPage: 5,
-            //         },
-            //     });
-                setItemsFetched([]);
-            }
-            if (itemType.id === '3') {
-            //     const response = await axiosInstanceItems.get<Item[]>('/category/all', {
             //         params: {
             //             page,
             //             perPage: 5,
@@ -196,13 +169,13 @@ const usePromotionForm = (idPromotion?: string) => {
             setError('No token found');
             return;
         }
-        if (idPromotion) {
-            _getPromotionToEdit(idPromotion);
+        if (idCategory) {
+            _getCategoryToEdit(idCategory);
         }
     }, []);
 
 
-    return { initialPromotion, isFetching: isLoading, errorSaving: error, isErrorSaving: isError, savePromotionApi: savePromotion, itemType, handleSelectedType, ItemsTypeList, itemsFetched, handlePage, page };
+    return { initialCategory, isFetching: isLoading, isErrorSaving: isError,errorSaving: error, saveCategoryApi: saveCategory, itemType, handleSelectedType, ItemsTypeList, itemsFetched, handlePage, page };
 };
 
-export default usePromotionForm;
+export default useCategoryForm;

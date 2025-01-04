@@ -51,6 +51,8 @@ const useBundleForm = (idBundle?: string) => {
     });
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isError, setIsError] = useState<boolean>(false);
+
     const [error, setError] = useState<string | null>(null);
     const [itemsFetched, setItemsFetched] = useState<Item[]>([]);
     const [page, setPage] = useState<number>(1);
@@ -59,6 +61,7 @@ const useBundleForm = (idBundle?: string) => {
     const saveBundle = async (bundle: BundleFormValues, id?: string) => {
         setIsLoading(true);
         setError(null);
+        setIsError(false);
 
         const formattedValues = new FormData();
         formattedValues.append('name', bundle.name);
@@ -89,6 +92,7 @@ const useBundleForm = (idBundle?: string) => {
             }
         } catch (err: any) {
             console.log(err);
+            setIsError(true);
             setError('Error saving bundle: ' + err.response.data.message,);
         } finally {
             setIsLoading(false);
@@ -100,6 +104,7 @@ const useBundleForm = (idBundle?: string) => {
 
         setIsLoading(true);
         setError(null);
+        setIsError(false);
         try {
             const response = await bundleInstanceApi.get<BundleDetails>(``, {
                 params: {
@@ -121,6 +126,7 @@ const useBundleForm = (idBundle?: string) => {
             });
         } catch (err: any) {
             console.error(err);
+            setIsError(true);
             setError(err.message);
         } finally {
             setIsLoading(false);
@@ -138,6 +144,7 @@ const useBundleForm = (idBundle?: string) => {
 
         setIsLoading(true);
         setError(null);
+        setIsError(false);
 
         try {
             const response = await axiosInstanceItems.get<Product[]>('/all', {
@@ -157,6 +164,7 @@ const useBundleForm = (idBundle?: string) => {
             setItemsFetched(products);
         } catch (err: any) {
             console.error(err);
+            setIsError(true);
             setError(err.message);
         } finally {
             setIsLoading(false);
@@ -176,7 +184,7 @@ useEffect(() => {
 }, []);
 
 
-return { initialBundle, isFetching: isLoading, errorSaving: error, saveBundleApi: saveBundle, itemsFetched, handlePage, page };
+return { initialBundle, isFetching: isLoading, errorSaving: error, isErrorSaving: isError, saveBundleApi: saveBundle, itemsFetched, handlePage, page };
 };
 
 export default useBundleForm;

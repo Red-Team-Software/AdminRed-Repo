@@ -1,17 +1,15 @@
 import ButtonsPagination from '@/components/buttons-pagination';
 import { ListboxWrapper } from '@/components/listbox-wrapper';
 import { title } from '@/components/primitives';
-import usePromotionForm, { PromotionFormValues } from '@/hooks/promotions/use-promotion-form';
+import useCategoryForm, { CategoryFormValues } from '@/hooks/categories/use-category-form';
 import { ModalFormProps } from '@/types';
-import { Button, Input, Listbox, ListboxItem, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea } from '@nextui-org/react';
+import { Button, Input, Listbox, ListboxItem, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@nextui-org/react';
 import { Form, Formik, FormikErrors } from 'formik';
 import ReactDOM from 'react-dom';
 
-function PromotionForm({ id, isOpen, onOpen }: ModalFormProps) {
+export default function CategoryForm({ id, isOpen, onOpen }: ModalFormProps) {
 
-    const { initialPromotion, errorSaving, isFetching, ItemsTypeList, itemsFetched, handleSelectedType, handlePage, page, itemType, savePromotionApi, isErrorSaving } = usePromotionForm(id);
-
-    const availableOption = ["YES", "NO"];
+    const { initialCategory, errorSaving, isFetching, ItemsTypeList, itemsFetched, handleSelectedType, handlePage, page, itemType, saveCategoryApi, isErrorSaving } = useCategoryForm(id);
 
     const container = document.getElementById("overlays") as HTMLElement;
     return ReactDOM.createPortal(
@@ -21,25 +19,17 @@ function PromotionForm({ id, isOpen, onOpen }: ModalFormProps) {
                 <ModalBody>
                     <Formik
                         enableReinitialize={true}
-                        initialValues={initialPromotion}
+                        initialValues={initialCategory}
                         validate={(values) => {
 
-                            const errors: FormikErrors<PromotionFormValues> = {};
+                            const errors: FormikErrors<CategoryFormValues> = {};
 
-                            if (!values.name || values.name.trim() === "" || values.name.length < 5) {
-                                errors.name = "Name is required and must be at least 5 characters";
+                            if (!values.name || values.name.trim() === "" || values.name.length < 3) {
+                                errors.name = "Name is required and must be at least 3 characters";
                             }
 
-                            if (!values.description || values.description.trim() === "" || values.description.length < 8) {
-                                errors.description = "Description is required and must be at least 8 characters";
-                            }
-
-                            if (!values.discount || parseInt(values.discount) < 1 || parseInt(values.discount) > 100) {
-                                errors.discount = "Discount is required and must be between 1 and 100";
-                            }
-
-                            if (!values.avaleableState) {
-                                errors.avaleableState = "Is Available is required";
+                            if (!values.image) {
+                                errors.image = "Image is required";
                             }
 
                             if (values.products.length === 0 && values.bundles.length === 0 ) {
@@ -52,9 +42,9 @@ function PromotionForm({ id, isOpen, onOpen }: ModalFormProps) {
                         }}
                         onSubmit={async (values, { setSubmitting }) => {
                             setSubmitting(true);
-                            await savePromotionApi(values, id);
-                            setSubmitting(false);
+                            await saveCategoryApi(values, id);
                             if ( !isErrorSaving ) onOpen();
+                            setSubmitting(false);
                         }}
                     >
                         {({  
@@ -84,49 +74,18 @@ function PromotionForm({ id, isOpen, onOpen }: ModalFormProps) {
                                     }}
                                 />
 
-                                <Textarea
-                                    isRequired
-                                    type="text"
-                                    name="description"
-                                    label="Description"
-                                    placeholder="Enter promotion description"
-                                    value={values.description}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    validate={() => {
-                                        if ( touched.description && errors.description) return errors.description;
-                                    }}
-                                />
-
                                 <Input
                                     isRequired
-                                    type="number"
-                                    name="discount"
-                                    label="Discount"
-                                    placeholder="15"
-                                    value={values.discount}
-                                    onBlur={handleBlur}
-                                    onChange={handleChange}
+                                    type="file"
+                                    name="images"
+                                    label="Images"
+                                    placeholder="Select image"
+                                    onChange={(event) => setFieldValue('image', event.target.files![0])}
                                     validate={() => {
-                                        if (errors.discount) return errors.discount;
+                                        if (errors.image && touched.image)
+                                            return errors.image.toString();
                                     }}
                                 />
-
-                                <Select
-                                    isRequired
-                                    name="avaleableState"
-                                    defaultSelectedKeys={["YES"]}
-                                    label="Is Available"
-                                    placeholder="Yes or Not"
-                                    value={values.avaleableState}
-                                >
-                                    {availableOption.map((option) => (
-                                        <SelectItem key={option} value={option} onChange={handleChange} onBlur={handleBlur}>
-                                            {option}
-                                        </SelectItem>
-                                    ))}
-                                </Select>
-                                {errors.avaleableState && <div className="text-red-500 text-center">{errors.avaleableState}</div>}
 
                                 <div className='flex justify-between items-start m-8'>
                                     <div className="w-1/2">
@@ -172,20 +131,6 @@ function PromotionForm({ id, isOpen, onOpen }: ModalFormProps) {
                                                 ))}
                                             </Listbox>
                                         </ListboxWrapper>
-
-                                        {/* <h2 className="mt-4 font-bold">Categories Selected:</h2>
-                                        <ListboxWrapper>
-                                            <Listbox
-                                                disallowEmptySelection
-                                                aria-label="items"
-                                                variant="faded"
-                                            //onSelectionChange={setSelectedKeys}
-                                            >
-                                                {values.categories.map((item, index) => (
-                                                    <ListboxItem key={index}>{item.name}</ListboxItem>
-                                                ))}
-                                            </Listbox>
-                                        </ListboxWrapper> */}
 
                                         <p className="text-sm text-gray-500 mt-4">Double click to remove item</p>
                                     </div>
@@ -257,6 +202,4 @@ function PromotionForm({ id, isOpen, onOpen }: ModalFormProps) {
         </Modal>,
         container
     );
-}
-
-export default PromotionForm
+};

@@ -7,6 +7,7 @@ import useShowList from "@/hooks/use-showlist";
 import DeleteModal from "@/components/delete-modal";
 import useCategories, { Category } from "@/hooks/categories/use-categories";
 import CategoryDetailsPage from "./categoryDetails";
+import CategoryForm from "./categoryForm";
 
 function CategoriesPage() {
 
@@ -20,7 +21,7 @@ function CategoriesPage() {
       <section className="flex flex-col items-center py-4 md:py-10">
         <div className="container mx-auto text-center justify-center">
           <div className="flex items-end justify-between">
-            <h1 className={title()}>Promotions List Page</h1>
+            <h1 className={title()}>Categories List Page</h1>
             <Button color="success" size="md" className="text-white" onPress={() => { handleOpenModal(ModalTarget.INSERT) }}>Add ➕</Button>
           </div>
 
@@ -67,7 +68,7 @@ function CategoriesPage() {
         </div>
       </section>
 
-  
+
       {isModalOpen && modalTargetState === ModalTarget.VIEW && (
         <CategoryDetailsPage
           id={selectedItem!.id}
@@ -75,22 +76,23 @@ function CategoriesPage() {
           onOpen={handleCloseModal}
         />
       )}
-  {/*
+
       {isModalOpen && modalTargetState === ModalTarget.INSERT && (
-        <PromotionForm
+        <CategoryForm
           isOpen={isModalOpen}
           onOpen={handleCloseModal}
         />
       )}
-      
-            {isModalOpen && modalTargetState === ModalTarget.EDIT && (
-                <ProductForm
-                    isOpen={isModalOpen}
-                    onOpen={handleCloseModal}
-                    id={selectedProduct!.id}
-                />
-            )}
-        */}
+
+
+      {isModalOpen && modalTargetState === ModalTarget.EDIT && (
+        <CategoryForm
+          isOpen={isModalOpen}
+          onOpen={handleCloseModal}
+          id={selectedItem!.id}
+        />
+      )}
+
 
       {isModalOpen && modalTargetState === ModalTarget.DELETE && (
         <DeleteModal

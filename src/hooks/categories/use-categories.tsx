@@ -44,7 +44,13 @@ const useCategories = () => {
     };
 
     function deleteCategory(id: string): void {
-        console.log('deletePromotion', id);
+        categoryInstanceApi.delete(`/delete/${id}`)
+        .then(() => {
+            fetchCategories();
+        }).catch((err) => {
+            console.error(err);
+            setError(err.message);
+        });
     }
 
     function handlePage(p: number): void {

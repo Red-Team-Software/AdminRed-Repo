@@ -10,7 +10,7 @@ import { Formik, FormikErrors, Form } from 'formik';
 import ReactDOM from 'react-dom';
 
 function BundleForm({ id, isOpen, onOpen }: ModalFormProps) {
-    const { initialBundle, isFetching, errorSaving, saveBundleApi, itemsFetched, page, handlePage } = useBundleForm(id);
+    const { initialBundle, isFetching, errorSaving, saveBundleApi, itemsFetched, page, handlePage, isErrorSaving } = useBundleForm(id);
 
     const handleFileChange = (
         event: React.ChangeEvent<HTMLInputElement>,
@@ -86,9 +86,7 @@ function BundleForm({ id, isOpen, onOpen }: ModalFormProps) {
                             await saveBundleApi(values, id);
 
                             setSubmitting(false);
-                            if (!errorSaving) {
-                                onOpen();
-                            }
+                            if ( isErrorSaving ) onOpen();
                         }}
                     >
                         {({

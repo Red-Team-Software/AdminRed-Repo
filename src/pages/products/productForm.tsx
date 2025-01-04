@@ -15,10 +15,11 @@ import ReactDOM from "react-dom";
 import { ProductFormValues } from "@/hooks/products/use-product-form";
 import { ModalFormProps } from "@/types";
 import { title } from "@/components/primitives";
+import { error } from "console";
 
 
 function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
-    const { initialProduct, isFetching, errorSaving, saveProductApi } = useProductForm(id);
+    const { initialProduct, isFetching, errorSaving, saveProductApi, isErrorSaving } = useProductForm(id);
 
     const handleFileChange = (
         event: React.ChangeEvent<HTMLInputElement>,
@@ -87,9 +88,8 @@ function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
                             // console.log(values);
                             await saveProductApi(values, id);
                             setSubmitting(false);
-                            if (!errorSaving) {
-                                onOpen();
-                            }
+                            if ( !isErrorSaving ) onOpen();
+
                         }}
                     >
                         {({
