@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { cuponInstanceApi } from '@/api/cupon-instance-api';
+import CuponInstanceApi from '@/api/cupon-instance-api';
 import { Cupon } from './use-cupons';
 
 export interface CuponFormValues {
@@ -42,6 +42,7 @@ const useCuponForm = (idCupon?: string) => {
                 console.log('update');
                 return;
             } else {
+                const cuponInstanceApi = CuponInstanceApi.getInstance();
                 const response = await cuponInstanceApi.post('/create', formData);
                 console.log(response);
             }
@@ -61,6 +62,7 @@ const useCuponForm = (idCupon?: string) => {
         setError(null);
         setIsError(false);
         try {
+            const cuponInstanceApi = CuponInstanceApi.getInstance();
             const response = await cuponInstanceApi.get<Cupon>(`${id}`);
             setInitialCupon({
                 id: response.data.id,

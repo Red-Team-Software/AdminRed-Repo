@@ -1,4 +1,4 @@
-import { promotionInstanceApi } from '@/api/promotion-instance-api';
+import PromotionInstanceApi from '@/api/promotion-instance-api';
 import { useEffect, useState } from 'react';
 
 export interface Promotion {
@@ -24,6 +24,7 @@ const usePromotions = () => {
         setError(null);
 
         try {
+            const promotionInstanceApi = PromotionInstanceApi.getInstance();
             const response = await promotionInstanceApi.get<Promotion[]>('/all',{
                 params: {
                     page,

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { bundleInstanceApi } from '@/api/bundle-instance-api';
+import BundleInstanceApi from '@/api/bundle-instance-api';
 
 export interface Bundle {
     id: string;
@@ -21,6 +21,7 @@ const useBundles = () => {
         setError(null);
 
         try {
+            const bundleInstanceApi = BundleInstanceApi.getInstance();
             const response = await bundleInstanceApi<Bundle[]>('/all', {
                 params: {
                     page,

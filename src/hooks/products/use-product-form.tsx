@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { DateValue } from '@nextui-org/react';
 import { CalendarDate, parseDate } from "@internationalized/date";
 import { ProductDetails } from './use-product-details';
-import { productInstanceApi } from '@/api/product-instance-api';
+import ProductInstanceApi from '@/api/product-instance-api';
 
 
 const formatDateForInput = (dateString: string): DateValue => {
@@ -82,7 +82,8 @@ const useProductForm = (idProduct?: string) => {
                 console.log('update');
                 return;
             } else {
-                const response = await productInstanceApi.post('/create', formData);
+                const api = ProductInstanceApi.getInstance();
+                const response = await api.post('/create', formData);
                 console.log(response);
             }
         } catch (err: any) {
@@ -101,7 +102,8 @@ const useProductForm = (idProduct?: string) => {
         setIsError(false);
 
         try {
-            const response = await productInstanceApi.get<ProductDetails>(``, {
+            const api = ProductInstanceApi.getInstance();
+            const response = await api.get<ProductDetails>(``, {
                 params: {
                     id: id,
                 },

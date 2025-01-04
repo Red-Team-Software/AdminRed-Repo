@@ -1,13 +1,23 @@
-import axios from 'axios';
+import axios, { AxiosInstance } from 'axios';
 
+class CuponInstanceApi {
+    private static instance: AxiosInstance;
 
-const apiUrl = import.meta.env.VITE_APIURL;
+    private constructor() {}
 
-export const productInstanceApi = axios.create({
-    baseURL: apiUrl + `/product`,
-    // timeout: 1000,
-    headers: {
-        // 'Content-Type': 'application/json',
-        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-    },
-});
+    public static getInstance(): AxiosInstance {
+        if (!this.instance) {
+            const apiUrl = import.meta.env.VITE_APIURL;
+            this.instance = axios.create({
+                baseURL: `${apiUrl}/product`,
+                headers: {
+                    Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+                },
+            });
+        }
+        return this.instance;
+    }
+
+}
+
+export default CuponInstanceApi;

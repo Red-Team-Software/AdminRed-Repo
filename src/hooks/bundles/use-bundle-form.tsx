@@ -1,25 +1,18 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Item } from '@/types';
 import { Product } from '../products/use-products';
 import { BundleDetails } from './use-bundle-details';
 import { DateValue } from '@nextui-org/react';
 import { parseDate, CalendarDate } from '@internationalized/date';
-import { bundleInstanceApi } from '@/api/bundle-instance-api';
+import BundleInstanceApi from '@/api/bundle-instance-api';
+import ProductInstanceApi from '@/api/product-instance-api';
 
-const apiUrl = import.meta.env.VITE_APIURL;
+
 
 const formatDateForInput = (dateString: string): DateValue => {
     const date = new Date(dateString);
     return parseDate(date.toISOString().split('T')[0]);
 };
-
-const axiosInstanceItems = axios.create({
-    baseURL: apiUrl + '/product',
-    headers: {
-        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-    },
-});
 
 export interface BundleFormValues {
     id?: string;
@@ -87,6 +80,7 @@ const useBundleForm = (idBundle?: string) => {
                 console.log('update');
                 return;
             } else {
+                const bundleInstanceApi = BundleInstanceApi.getInstance();
                 const response = await bundleInstanceApi.post('/create', formattedValues);
                 console.log(response);
             }
@@ -106,6 +100,7 @@ const useBundleForm = (idBundle?: string) => {
         setError(null);
         setIsError(false);
         try {
+            const bundleInstanceApi = BundleInstanceApi.getInstance();
             const response = await bundleInstanceApi.get<BundleDetails>(``, {
                 params: {
                     id: id,
@@ -147,7 +142,8 @@ const useBundleForm = (idBundle?: string) => {
         setIsError(false);
 
         try {
-            const response = await axiosInstanceItems.get<Product[]>('/all', {
+            const productInstanceApi = ProductInstanceApi.getInstance();
+            const response = await productInstanceApi.get<Product[]>('/all', {
                 params: {
                     page,
                     perPage: 7,

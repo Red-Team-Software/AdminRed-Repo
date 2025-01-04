@@ -1,4 +1,4 @@
-import { cuponInstanceApi } from '@/api/cupon-instance-api';
+import CuponInstanceApi from '@/api/cupon-instance-api';
 import { useEffect, useState } from 'react';
 
 export interface Cupon {
@@ -21,6 +21,7 @@ const useCupons = () => {
         setError(null);
 
         try {
+            const cuponInstanceApi = CuponInstanceApi.getInstance();
             const response = await cuponInstanceApi.get<Cupon[]>('/all',{
                 params: {
                     page,

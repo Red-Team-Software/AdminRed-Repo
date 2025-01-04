@@ -1,12 +1,23 @@
-import axios from "axios";
+import axios, { AxiosInstance } from 'axios';
 
+class CategoryInstanceApi {
+    private static instance: AxiosInstance;
 
-const apiUrl = import.meta.env.VITE_APIURL;
+    private constructor() {}
 
-export const categoryInstanceApi = axios.create({
-    baseURL: apiUrl + '/category',
-    // timeout: 1000,
-    headers: {
-        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-    },
-});
+    public static getInstance(): AxiosInstance {
+        if (!this.instance) {
+            const apiUrl = import.meta.env.VITE_APIURL;
+            this.instance = axios.create({
+                baseURL: `${apiUrl}/category`,
+                headers: {
+                    Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+                },
+            });
+        }
+        return this.instance;
+    }
+
+}
+
+export default CategoryInstanceApi;

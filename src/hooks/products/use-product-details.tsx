@@ -1,4 +1,4 @@
-import { productInstanceApi } from '@/api/product-instance-api';
+import ProductInstanceApi from '@/api/product-instance-api';
 import { useState, useEffect } from 'react';
 
 interface IPromotions {
@@ -31,6 +31,7 @@ const useProductDetails = (idProduct: string) => {
         setIsLoading(true);
         setError(null);
         try {
+            const productInstanceApi = ProductInstanceApi.getInstance();
             const response = await productInstanceApi.get<ProductDetails>('', {
                 params: {
                     id: idProduct,

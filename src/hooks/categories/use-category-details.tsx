@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Item } from '@/types';
-import { categoryInstanceApi } from '@/api/category-instance-api';
+import CategoryInstanceApi from '@/api/category-instance-api';
 
 
 export interface CategoryDetails {
@@ -21,6 +21,7 @@ const useCategoryDetails = (idCategory: string) => {
         setError(null);
 
         try {
+            const categoryInstanceApi = CategoryInstanceApi.getInstance();
             const response = await categoryInstanceApi.get<CategoryDetails>('', {
                 params: {
                     id: idCategory,

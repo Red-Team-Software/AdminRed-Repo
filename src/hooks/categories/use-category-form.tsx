@@ -1,16 +1,12 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Item } from '@/types';
 import { Product } from '../products/use-products';
-import { categoryInstanceApi } from '@/api/category-instance-api';
+import CategoryInstanceApi from '@/api/category-instance-api';
+import ProductInstanceApi from '@/api/product-instance-api';
+import BundleInstanceApi from '@/api/bundle-instance-api';
+
 import { CategoryDetails } from './use-category-details';
 
-const axiosInstanceItems = axios.create({
-    baseURL: import.meta.env.VITE_APIURL,
-    headers: {
-        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-    },
-});
 
 export interface CategoryFormValues {
     id?: string;
@@ -61,6 +57,7 @@ const useCategoryForm = (idCategory?: string) => {
                 console.log('update');
                 return;
             } else {
+                const categoryInstanceApi = CategoryInstanceApi.getInstance();
                 const response = await categoryInstanceApi.post('/create', formData);
                 console.log(response);
             }
@@ -80,6 +77,7 @@ const useCategoryForm = (idCategory?: string) => {
         setError(null);
         setIsError(false);
         try {
+            const categoryInstanceApi = CategoryInstanceApi.getInstance();
             const response = await categoryInstanceApi.get<CategoryDetails>(``, {
                 params: {
                     id: id,
@@ -119,7 +117,8 @@ const useCategoryForm = (idCategory?: string) => {
                 return;
             }
             if (itemId === '1') {
-                const response = await axiosInstanceItems.get<Product[]>('/product/all', {
+                const productInstanceApi = ProductInstanceApi.getInstance();
+                const response = await productInstanceApi.get<Product[]>('/all', {
                     params: {
                         page,
                         perPage: 7,
@@ -136,12 +135,8 @@ const useCategoryForm = (idCategory?: string) => {
                 setItemsFetched(products);
             }
             if (itemId === '2') {
-            //     const response = await axiosInstanceItems.get<Item[]>('/bundle/all', {
-            //         params: {
-            //             page,
-            //             perPage: 5,
-            //         },
-            //     });
+                const bundleInstanceApi = BundleInstanceApi.getInstance();
+                console.log('fetching bundles', bundleInstanceApi.toString());
                 setItemsFetched([]);
             }
         } catch (err: any) {

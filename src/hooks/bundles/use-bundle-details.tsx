@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Item } from '@/types';
-import { bundleInstanceApi } from '@/api/bundle-instance-api';
+import BundleInstanceApi from '@/api/bundle-instance-api';
 
 
 interface IPromotions {
@@ -35,6 +35,7 @@ const useBundleDetails = (idBundle: string) => {
         setError(null);
 
         try {
+            const bundleInstanceApi = BundleInstanceApi.getInstance();
             const response = await bundleInstanceApi.get<BundleDetails>('', {
                 params: {
                     id: idBundle,

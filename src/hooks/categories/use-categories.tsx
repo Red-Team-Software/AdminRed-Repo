@@ -1,4 +1,4 @@
-import { categoryInstanceApi } from '@/api/category-instance-api';
+import CategoryInstanceApi from '@/api/category-instance-api';
 import { useEffect, useState } from 'react';
 
 export interface Category {
@@ -25,6 +25,7 @@ const useCategories = () => {
         setError(null);
 
         try {
+            const categoryInstanceApi = CategoryInstanceApi.getInstance();
             const response = await categoryInstanceApi.get<ICategoryResponse[]>('/all',{
                 params: {
                     page,
@@ -44,6 +45,7 @@ const useCategories = () => {
     };
 
     function deleteCategory(id: string): void {
+        const categoryInstanceApi = CategoryInstanceApi.getInstance();
         categoryInstanceApi.delete(`/delete/${id}`)
         .then(() => {
             fetchCategories();

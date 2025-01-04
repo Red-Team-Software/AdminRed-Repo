@@ -1,12 +1,23 @@
-import axios from 'axios';
+import axios, { AxiosInstance } from 'axios';
 
+class PromotionInstanceApi {
+    private static instance: AxiosInstance;
 
+    private constructor() {}
 
-const apiUrl = import.meta.env.VITE_APIURL;
+    public static getInstance(): AxiosInstance {
+        if (!this.instance) {
+            const apiUrl = import.meta.env.VITE_APIURL;
+            this.instance = axios.create({
+                baseURL: `${apiUrl}/promotion`,
+                headers: {
+                    Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+                },
+            });
+        }
+        return this.instance;
+    }
 
-export const promotionInstanceApi = axios.create({
-    baseURL: apiUrl + '/promotion',
-    headers: {
-        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-    },
-});
+}
+
+export default PromotionInstanceApi;

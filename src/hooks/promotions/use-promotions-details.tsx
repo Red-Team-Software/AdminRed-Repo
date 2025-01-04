@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Item } from '@/types';
-import { promotionInstanceApi } from '@/api/promotion-instance-api';
+import PromotionInstanceApi from '@/api/promotion-instance-api';
 
 
 
@@ -25,6 +25,7 @@ const usePromotionDetails = (idPomotion: string) => {
         setError(null);
 
         try {
+            const promotionInstanceApi = PromotionInstanceApi.getInstance();
             const response = await promotionInstanceApi.get<IPromotionsDetails>('', {
                 params: {
                     id: idPomotion,

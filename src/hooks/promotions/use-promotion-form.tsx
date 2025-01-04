@@ -1,16 +1,11 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Item } from '@/types';
 import { IPromotionsDetails } from './use-promotions-details';
 import { Product } from '../products/use-products';
-import { promotionInstanceApi } from '@/api/promotion-instance-api';
+import PromotionInstanceApi from '@/api/promotion-instance-api';
+import ProductInstaceApi from '@/api/product-instance-api';
 
-const axiosInstanceItems = axios.create({
-    baseURL: import.meta.env.VITE_APIURL,
-    headers: {
-        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-    },
-});
+
 
 export interface PromotionFormValues {
     id?: string;
@@ -77,6 +72,7 @@ const usePromotionForm = (idPromotion?: string) => {
                 console.log('update');
                 return;
             } else {
+                const promotionInstanceApi = PromotionInstanceApi.getInstance();
                 const response = await promotionInstanceApi.post('/create', formattedValues);
                 console.log(response);
             }
@@ -96,6 +92,7 @@ const usePromotionForm = (idPromotion?: string) => {
         setError(null);
         setIsError(false);
         try {
+            const promotionInstanceApi = PromotionInstanceApi.getInstance();
             const response = await promotionInstanceApi.get<IPromotionsDetails>(``, {
                 params: {
                     id: id,
@@ -137,7 +134,8 @@ const usePromotionForm = (idPromotion?: string) => {
                 return;
             }
             if (itemId === '1') {
-                const response = await axiosInstanceItems.get<Product[]>('/product/all', {
+                const productInstanceApi = ProductInstaceApi.getInstance();
+                const response = await productInstanceApi.get<Product[]>('/all', {
                     params: {
                         page,
                         perPage: 7,

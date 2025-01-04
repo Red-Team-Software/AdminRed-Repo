@@ -1,4 +1,4 @@
-import { productInstanceApi } from '@/api/product-instance-api';
+import ProductInstanceApi from '@/api/product-instance-api';
 import { useState, useEffect } from 'react';
 
 export interface Product {
@@ -21,7 +21,8 @@ const useProducts = () => {
         setError(null);
 
         try {
-            const response = await productInstanceApi<Product[]>('/all', {
+            const api = ProductInstanceApi.getInstance();
+            const response = await api<Product[]>('/all', {
                 params: {
                     page,
                     perPage: 10,
@@ -32,6 +33,7 @@ const useProducts = () => {
             products = response.data.map(e => e)
             setProducts(products);
         } catch (err: any) {
+            console.log(err);
             setError(err.message);
         } finally {
             setIsLoading(false);
