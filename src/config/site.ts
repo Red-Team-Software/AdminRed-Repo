@@ -20,6 +20,10 @@ export const siteConfig = {
       label: "Promotions",
       href: "/promotions",
     },
+    {
+      label: "Cupons",
+      href: "/cupons",
+    },
   ],
   links: {
     github: "https://github.com/Red-Team-Software",

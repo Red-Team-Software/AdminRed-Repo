@@ -6,6 +6,7 @@ import CategoriesPage from "@/pages/categories/categories";
 import ProductsPage from "@/pages/products/products";
 import ProtectedRoute from "@/config/protected-route";
 import PromotionsPage from "./pages/promotions/promotions";
+import CuponsPage from "./pages/cupons/cupons";
 
 
 function App() {
@@ -43,6 +44,14 @@ function App() {
           </ProtectedRoute>
         }
         path="/promotions"
+      />
+      <Route
+        element={
+          <ProtectedRoute>
+            <CuponsPage />
+          </ProtectedRoute>
+        }
+        path="/cupons"
       />
     </Routes>
   );

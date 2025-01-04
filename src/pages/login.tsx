@@ -74,7 +74,7 @@ export default function LoginPage() {
             }}
             onSubmit={async (values, { setSubmitting }) => {
               setError(null);
-              console.log(values);
+              // console.log(values);
               try {
                 const { data } = await axios.post(apiUrl + '/auth/login', values);
                 
@@ -90,7 +90,7 @@ export default function LoginPage() {
                   setError('Failed to save token');
                 }
               } catch (e) {
-                console.log(e);
+                // console.log(e);
                 if (e instanceof AxiosError) {
                   setError(e.response?.data.message);
                 } else {

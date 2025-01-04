@@ -15,7 +15,6 @@ import ReactDOM from "react-dom";
 import { ProductFormValues } from "@/hooks/products/use-product-form";
 import { ModalFormProps } from "@/types";
 import { title } from "@/components/primitives";
-import { error } from "console";
 
 
 function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
