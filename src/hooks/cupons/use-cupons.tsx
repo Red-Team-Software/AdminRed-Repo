@@ -22,7 +22,7 @@ const useCupons = () => {
 
         try {
             const cuponInstanceApi = CuponInstanceApi.getInstance();
-            const response = await cuponInstanceApi.get<Cupon[]>('/all',{
+            const response = await cuponInstanceApi.get<Cupon[]>('/many',{
                 params: {
                     page,
                     perPage: 10,
@@ -37,7 +37,7 @@ const useCupons = () => {
     };
 
     function deleteCupon(id: string): void {
-        console.log('deletePromotion', id);
+        console.log('delete cupon: ', id);
     }
 
     function handlePage(p: number): void {

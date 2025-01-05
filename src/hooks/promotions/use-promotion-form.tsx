@@ -4,6 +4,7 @@ import { IPromotionsDetails } from './use-promotions-details';
 import { Product } from '../products/use-products';
 import PromotionInstanceApi from '@/api/promotion-instance-api';
 import ProductInstaceApi from '@/api/product-instance-api';
+import BundleInstanceApi from '@/api/bundle-instance-api';
 
 
 
@@ -93,11 +94,7 @@ const usePromotionForm = (idPromotion?: string) => {
         setIsError(false);
         try {
             const promotionInstanceApi = PromotionInstanceApi.getInstance();
-            const response = await promotionInstanceApi.get<IPromotionsDetails>(``, {
-                params: {
-                    id: id,
-                },
-            });
+            const response = await promotionInstanceApi.get<IPromotionsDetails>(`/${id}`);
             setInitialPromotion({
                 id: response.data.id,
                 name: response.data.name,
@@ -135,7 +132,7 @@ const usePromotionForm = (idPromotion?: string) => {
             }
             if (itemId === '1') {
                 const productInstanceApi = ProductInstaceApi.getInstance();
-                const response = await productInstanceApi.get<Product[]>('/all', {
+                const response = await productInstanceApi.get<Product[]>('/many', {
                     params: {
                         page,
                         perPage: 7,
@@ -152,13 +149,16 @@ const usePromotionForm = (idPromotion?: string) => {
                 setItemsFetched(products);
             }
             if (itemId === '2') {
-            //     const response = await axiosInstanceItems.get<Item[]>('/bundle/all', {
-            //         params: {
-            //             page,
-            //             perPage: 5,
-            //         },
-            //     });
-                setItemsFetched([]);
+                const bundleInstanceApi = BundleInstanceApi.getInstance();
+                
+                const { data } = await bundleInstanceApi.get<Item[]>('/many', {
+                    params: {
+                        page,
+                        perPage: 5,
+                    },
+                });
+
+                setItemsFetched(data);
             }
             if (itemType.id === '3') {
             //     const response = await axiosInstanceItems.get<Item[]>('/category/all', {

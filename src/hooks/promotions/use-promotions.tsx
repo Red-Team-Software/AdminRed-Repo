@@ -25,13 +25,13 @@ const usePromotions = () => {
 
         try {
             const promotionInstanceApi = PromotionInstanceApi.getInstance();
-            const response = await promotionInstanceApi.get<Promotion[]>('/all',{
+            const { data } = await promotionInstanceApi.get<Promotion[]>('/many',{
                 params: {
                     page,
                     perPage: 10,
                 },
             });
-            setPromotions(response.data);
+            setPromotions(data);
         } catch (err: any) {
             setError(err.message);
         } finally {
@@ -40,7 +40,7 @@ const usePromotions = () => {
     };
 
     function deletePromotion(id: string): void {
-        console.log('deletePromotion', id);
+        console.log('delete Promotion: ', id);
     }
 
     function handlePage(p: number): void {

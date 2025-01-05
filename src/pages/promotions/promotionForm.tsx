@@ -168,7 +168,7 @@ function PromotionForm({ id, isOpen, onOpen }: ModalFormProps) {
                                             //onSelectionChange={setSelectedKeys}
                                             >
                                                 {values.bundles.map((item, index) => (
-                                                    <ListboxItem key={index}>{item.name}</ListboxItem>
+                                                    <ListboxItem key={index} onDoubleClick={() => setFieldValue('bundles', values.products.filter((_, i) => i !== index))}>{item.name}</ListboxItem>
                                                 ))}
                                             </Listbox>
                                         </ListboxWrapper>

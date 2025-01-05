@@ -22,7 +22,7 @@ const useBundles = () => {
 
         try {
             const bundleInstanceApi = BundleInstanceApi.getInstance();
-            const response = await bundleInstanceApi<Bundle[]>('/all', {
+            const response = await bundleInstanceApi<Bundle[]>('/many', {
                 params: {
                     page,
                     perPage: 10,
@@ -40,18 +40,19 @@ const useBundles = () => {
     };
 
     const deleteBundle = async (id: string) => {
-        console.log('deleteBundle', id);
-        // setIsLoading(true);
-        // setError(null);
+        // console.log('deleteBundle', id);
+        setIsLoading(true);
+        setError(null);
 
-        // try {
-        //     await axiosInstance.delete(`/${id}`);
-        //     fetchProducts();
-        // } catch (err: any) {
-        //     setError(err.message);
-        // } finally {
-        //     setIsLoading(false);
-        // }
+        try {
+            const bundleInstanceApi = BundleInstanceApi.getInstance();
+            await bundleInstanceApi.delete(`/delete/${id}`);
+            fetchBundles();
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     useEffect(() => {

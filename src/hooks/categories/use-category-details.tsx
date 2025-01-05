@@ -22,12 +22,7 @@ const useCategoryDetails = (idCategory: string) => {
 
         try {
             const categoryInstanceApi = CategoryInstanceApi.getInstance();
-            const response = await categoryInstanceApi.get<CategoryDetails>('', {
-                params: {
-                    id: idCategory,
-                },
-            }
-            );
+            const response = await categoryInstanceApi.get<CategoryDetails>(`/${idCategory}`);
             // console.log(response)
             setCategory({
                 id: response.data.id,

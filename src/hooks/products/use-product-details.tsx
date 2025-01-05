@@ -32,12 +32,7 @@ const useProductDetails = (idProduct: string) => {
         setError(null);
         try {
             const productInstanceApi = ProductInstanceApi.getInstance();
-            const response = await productInstanceApi.get<ProductDetails>('', {
-                params: {
-                    id: idProduct,
-                },
-            }
-            );
+            const response = await productInstanceApi.get<ProductDetails>(`/${idProduct}`);
             setProduct(response.data);
         } catch (err: any) {
             setError(err.message);

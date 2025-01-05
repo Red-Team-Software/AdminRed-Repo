@@ -63,7 +63,7 @@ const useCuponForm = (idCupon?: string) => {
         setIsError(false);
         try {
             const cuponInstanceApi = CuponInstanceApi.getInstance();
-            const response = await cuponInstanceApi.get<Cupon>(`${id}`);
+            const response = await cuponInstanceApi.get<Cupon>(`/${id}`);
             setInitialCupon({
                 id: response.data.id,
                 name: response.data.name,

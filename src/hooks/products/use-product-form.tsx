@@ -103,11 +103,7 @@ const useProductForm = (idProduct?: string) => {
 
         try {
             const api = ProductInstanceApi.getInstance();
-            const response = await api.get<ProductDetails>(``, {
-                params: {
-                    id: id,
-                },
-            });
+            const response = await api.get<ProductDetails>(`/${id}`);
             // console.log(response.data);
             setInitialProduct({
                 id: response.data.id,

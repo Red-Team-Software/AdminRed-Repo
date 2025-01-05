@@ -101,11 +101,7 @@ const useBundleForm = (idBundle?: string) => {
         setIsError(false);
         try {
             const bundleInstanceApi = BundleInstanceApi.getInstance();
-            const response = await bundleInstanceApi.get<BundleDetails>(``, {
-                params: {
-                    id: id,
-                },
-            });
+            const response = await bundleInstanceApi.get<BundleDetails>(`/${id}`);
             setInitialBundle({
                 id: response.data.id,
                 name: response.data.name,
@@ -143,7 +139,7 @@ const useBundleForm = (idBundle?: string) => {
 
         try {
             const productInstanceApi = ProductInstanceApi.getInstance();
-            const response = await productInstanceApi.get<Product[]>('/all', {
+            const response = await productInstanceApi.get<Product[]>('/many', {
                 params: {
                     page,
                     perPage: 7,

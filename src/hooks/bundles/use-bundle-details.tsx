@@ -36,12 +36,7 @@ const useBundleDetails = (idBundle: string) => {
 
         try {
             const bundleInstanceApi = BundleInstanceApi.getInstance();
-            const response = await bundleInstanceApi.get<BundleDetails>('', {
-                params: {
-                    id: idBundle,
-                },
-            }
-            );
+            const response = await bundleInstanceApi.get<BundleDetails>(`/${idBundle}`);
             setBundle(response.data);
         } catch (err: any) {
             setError(err.message);

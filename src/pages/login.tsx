@@ -77,12 +77,16 @@ export default function LoginPage() {
               // console.log(values);
               try {
                 const { data } = await axios.post(apiUrl + '/auth/login', values);
+                // console.log(data);
+                
+                if (data.type !== 'ADMIN') throw new Error('You are not an admin');
                 
                 // Guarda el token en sessionStorage
                 sessionStorage.setItem('token', data.token);
 
                 // Verifica que el token esté guardado correctamente
                 const token = sessionStorage.getItem('token');
+
                 if (token) {
                   // Redirige a la página de productos
                   navigate('/products');

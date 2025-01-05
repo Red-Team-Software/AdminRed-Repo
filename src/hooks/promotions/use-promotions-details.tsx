@@ -26,14 +26,9 @@ const usePromotionDetails = (idPomotion: string) => {
 
         try {
             const promotionInstanceApi = PromotionInstanceApi.getInstance();
-            const response = await promotionInstanceApi.get<IPromotionsDetails>('', {
-                params: {
-                    id: idPomotion,
-                },
-            }
-            );
-            console.log(response)
-            setPromotion(response.data);
+            const { data } = await promotionInstanceApi.get<IPromotionsDetails>(`/${idPomotion}`);
+            // console.log(data)
+            setPromotion(data);
         } catch (err: any) {
             setError(err.message);
         } finally {

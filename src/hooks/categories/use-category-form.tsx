@@ -78,11 +78,7 @@ const useCategoryForm = (idCategory?: string) => {
         setIsError(false);
         try {
             const categoryInstanceApi = CategoryInstanceApi.getInstance();
-            const response = await categoryInstanceApi.get<CategoryDetails>(``, {
-                params: {
-                    id: id,
-                },
-            });
+            const response = await categoryInstanceApi.get<CategoryDetails>(`/${id}`);
             setInitialCategory({
                 id: response.data.id,
                 name: response.data.name,
@@ -118,7 +114,7 @@ const useCategoryForm = (idCategory?: string) => {
             }
             if (itemId === '1') {
                 const productInstanceApi = ProductInstanceApi.getInstance();
-                const response = await productInstanceApi.get<Product[]>('/all', {
+                const response = await productInstanceApi.get<Product[]>('/many', {
                     params: {
                         page,
                         perPage: 7,

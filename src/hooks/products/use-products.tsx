@@ -22,7 +22,7 @@ const useProducts = () => {
 
         try {
             const api = ProductInstanceApi.getInstance();
-            const response = await api<Product[]>('/all', {
+            const response = await api<Product[]>('/many', {
                 params: {
                     page,
                     perPage: 10,
@@ -42,17 +42,18 @@ const useProducts = () => {
 
     const deleteProduct = async (id: string) => {
         console.log('deleteProduct', id);
-        // setIsLoading(true);
-        // setError(null);
+        setIsLoading(true);
+        setError(null);
 
-        // try {
-        //     await axiosInstance.delete(`/${id}`);
-        //     fetchProducts();
-        // } catch (err: any) {
-        //     setError(err.message);
-        // } finally {
-        //     setIsLoading(false);
-        // }
+        try {
+            const api = ProductInstanceApi.getInstance();
+            await api.delete(`/delete/${id}`);
+            fetchProducts();
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     useEffect(() => {
