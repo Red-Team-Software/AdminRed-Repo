@@ -86,6 +86,7 @@ export default function CategoryForm({ id, isOpen, onOpen }: ModalFormProps) {
                                             return errors.image.toString();
                                     }}
                                 />
+                                
                                 <div className='flex justify-end'>
                                     <Image
                                         key={values.image.name}

@@ -76,7 +76,7 @@ function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
                                 errors.measurement = "Required";
                             }
 
-                            if (!values.images || values.images.length < 1) {
+                            if (!values.images || values.images.length === 0) {
                                 errors.images = "Required";
                             }
 
@@ -227,6 +227,9 @@ function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
                                             return errors.images.toString();
                                     }}
                                 />
+                                {values.images.length === 0 ? (
+                                    <div className="text-red-500 text-sm">Must provide an image</div>
+                                ): null}
                                 <div className="flex flex-row gap-3">
                                     {values.images &&
                                         values.images.map((image: any, index: number) => (
@@ -236,9 +239,15 @@ function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
                                                 alt="product"
                                                 width={40}
                                                 height={40}
+                                                onDoubleClick={() => setFieldValue('images', values.images.filter((_, i) => i !== index))}
                                             />
                                         ))}
                                 </div>
+                                {values.images && values.images.length > 0 ?
+                                    <p className="text-sm text-gray-500 mt-4">Double click to remove image</p>
+                                    : null
+                                }
+                                
                                 <ModalFooter className="flex justify-center py-4">
                                     {isSubmitting && (
                                         <div className="flex justify-center">

@@ -86,7 +86,7 @@ function BundleForm({ id, isOpen, onOpen }: ModalFormProps) {
                             await saveBundleApi(values, id);
 
                             setSubmitting(false);
-                            if ( isErrorSaving ) onOpen();
+                            if (isErrorSaving) onOpen();
                         }}
                     >
                         {({
@@ -224,23 +224,26 @@ function BundleForm({ id, isOpen, onOpen }: ModalFormProps) {
                                             return errors.images.toString();
                                     }}
                                 />
-
-                                <div>
-                                    {values.images && values.images.length > 0 && (
-                                        <div className="flex gap-2">
-                                            {values.images.map((image, index) => (
-                                                <Image
-                                                    key={index}
-                                                    src={URL.createObjectURL(image)}
-                                                    alt={`image-${index}`}
-                                                    width={40}
-                                                    height={40}
-                                                />
-                                            ))}
-                                        </div>
-                                    )}
+                                {values.images.length === 0 ? (
+                                    <div className="text-red-500 text-sm">Must provide an image</div>
+                                ) : null}
+                                <div className="flex flex-row gap-3">
+                                    {values.images &&
+                                        values.images.map((image: any, index: number) => (
+                                            <Image
+                                                key={index}
+                                                src={URL.createObjectURL(image)}
+                                                alt="product"
+                                                width={40}
+                                                height={40}
+                                                onDoubleClick={() => setFieldValue('images', values.images.filter((_, i) => i !== index))}
+                                            />
+                                        ))}
                                 </div>
-
+                                {values.images && values.images.length > 0 ?
+                                    <p className="text-sm text-gray-500 mt-4">Double click to remove image</p>
+                                    : null
+                                }
 
                                 <div className='flex justify-between items-start m-8'>
                                     <div className="w-1/2">
