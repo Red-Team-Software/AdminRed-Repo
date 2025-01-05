@@ -97,7 +97,9 @@ export default function LoginPage() {
                 // console.log(e);
                 if (e instanceof AxiosError) {
                   setError(e.response?.data.message);
-                } else {
+                } else if (e instanceof Error) {
+                  setError(e.message);
+                } else{
                   setError(String(e));
                 }
               } finally {
