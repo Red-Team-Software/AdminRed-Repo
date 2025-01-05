@@ -1,5 +1,6 @@
 import useProductForm from "@/hooks/products/use-product-form";
 import {
+    Image,
     Modal,
     ModalBody,
     ModalContent,
@@ -226,6 +227,18 @@ function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
                                             return errors.images.toString();
                                     }}
                                 />
+                                <div className="flex flex-row gap-3">
+                                    {values.images &&
+                                        values.images.map((image: any, index: number) => (
+                                            <Image
+                                                key={index}
+                                                src={URL.createObjectURL(image)}
+                                                alt="product"
+                                                width={40}
+                                                height={40}
+                                            />
+                                        ))}
+                                </div>
                                 <ModalFooter className="flex justify-center py-4">
                                     {isSubmitting && (
                                         <div className="flex justify-center">

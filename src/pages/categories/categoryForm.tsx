@@ -3,7 +3,7 @@ import { ListboxWrapper } from '@/components/listbox-wrapper';
 import { title } from '@/components/primitives';
 import useCategoryForm, { CategoryFormValues } from '@/hooks/categories/use-category-form';
 import { ModalFormProps } from '@/types';
-import { Button, Input, Listbox, ListboxItem, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@nextui-org/react';
+import { Image, Button, Input, Listbox, ListboxItem, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@nextui-org/react';
 import { Form, Formik, FormikErrors } from 'formik';
 import ReactDOM from 'react-dom';
 
@@ -32,7 +32,7 @@ export default function CategoryForm({ id, isOpen, onOpen }: ModalFormProps) {
                                 errors.image = "Image is required";
                             }
 
-                            if (values.products.length === 0 && values.bundles.length === 0 ) {
+                            if (values.products.length === 0 && values.bundles.length === 0) {
                                 errors.products = "At least one product, bundle or category is required";
                                 errors.bundles = "At least one product, bundle or category is required";
                                 // errors.categories = "At least one product, bundle or category is required";
@@ -43,11 +43,11 @@ export default function CategoryForm({ id, isOpen, onOpen }: ModalFormProps) {
                         onSubmit={async (values, { setSubmitting }) => {
                             setSubmitting(true);
                             await saveCategoryApi(values, id);
-                            if ( !isErrorSaving ) onOpen();
+                            if (!isErrorSaving) onOpen();
                             setSubmitting(false);
                         }}
                     >
-                        {({  
+                        {({
                             values,
                             handleChange,
                             handleSubmit,
@@ -70,7 +70,7 @@ export default function CategoryForm({ id, isOpen, onOpen }: ModalFormProps) {
                                     onBlur={handleBlur}
                                     onChange={handleChange}
                                     validate={() => {
-                                        if ( touched.name && errors.name) return errors.name;                                        
+                                        if (touched.name && errors.name) return errors.name;
                                     }}
                                 />
 
@@ -86,6 +86,15 @@ export default function CategoryForm({ id, isOpen, onOpen }: ModalFormProps) {
                                             return errors.image.toString();
                                     }}
                                 />
+                                <div className='flex justify-end'>
+                                    <Image
+                                        key={values.image.name}
+                                        src={URL.createObjectURL(values.image)}
+                                        alt="product"
+                                        width={40}
+                                        height={40}
+                                    />
+                                </div>
 
                                 <div className='flex justify-between items-start m-8'>
                                     <div className="w-1/2">
@@ -152,11 +161,11 @@ export default function CategoryForm({ id, isOpen, onOpen }: ModalFormProps) {
                                                             <TableCell>{item.name}</TableCell>
                                                             <TableCell className="flex gap-1 items-center">
                                                                 <Button color="primary" size="sm" variant="flat" onPress={() => {
-                                                                    if (itemType.id=== '1') {
+                                                                    if (itemType.id === '1') {
                                                                         if (values.products.find((p) => p.id === item.id)) return;
                                                                         setFieldValue('products', [...values.products, item]);
                                                                     }
-                                                                    if (itemType.id=== '2') {
+                                                                    if (itemType.id === '2') {
                                                                         if (values.products.find((p) => p.id === item.id)) return;
                                                                         setFieldValue('bundles', [...values.bundles, item]);
                                                                     }

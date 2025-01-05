@@ -5,7 +5,7 @@ import useBundleForm, { BundleFormValues } from '@/hooks/bundles/use-bundle-form
 import { ModalFormProps } from '@/types'
 import { Button } from '@nextui-org/button';
 import { Textarea } from '@nextui-org/input';
-import { Modal, ModalContent, ModalHeader, ModalBody, DateInput, ModalFooter, Input, Listbox, ListboxItem, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@nextui-org/react';
+import { Modal, ModalContent, ModalHeader, ModalBody, DateInput, ModalFooter, Input, Listbox, ListboxItem, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Image } from '@nextui-org/react';
 import { Formik, FormikErrors, Form } from 'formik';
 import ReactDOM from 'react-dom';
 
@@ -224,6 +224,22 @@ function BundleForm({ id, isOpen, onOpen }: ModalFormProps) {
                                             return errors.images.toString();
                                     }}
                                 />
+
+                                <div>
+                                    {values.images && values.images.length > 0 && (
+                                        <div className="flex gap-2">
+                                            {values.images.map((image, index) => (
+                                                <Image
+                                                    key={index}
+                                                    src={URL.createObjectURL(image)}
+                                                    alt={`image-${index}`}
+                                                    width={40}
+                                                    height={40}
+                                                />
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
 
 
                                 <div className='flex justify-between items-start m-8'>
