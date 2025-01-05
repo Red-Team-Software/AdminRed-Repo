@@ -37,6 +37,7 @@ const useProductForm = (idProduct?: string) => {
         weigth: "1.00",
         measurement: "g",
     });
+    const [ originalProduct, setOriginalProduct ] = useState<ProductFormValues | null>(null);
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isError, setIsError] = useState<boolean>(false);
@@ -60,28 +61,44 @@ const useProductForm = (idProduct?: string) => {
 
 
         const formData = new FormData();
-        formData.append('name', formattedValues.name);
-        formData.append('price', formattedValues.price.toString());
-        formData.append('description', formattedValues.description);
-        formData.append('currency', formattedValues.currency);
+        if ((originalProduct && originalProduct.name !== formattedValues.name)|| !originalProduct) 
+            formData.append('name', formattedValues.name);
 
-        formData.append('stock', formattedValues.stock.toString());
-        formData.append('weigth', formattedValues.weight.toString());
-        formData.append('caducityDate', formattedValues.caducityDate);
-        formData.append('measurement', formattedValues.measurement);
+        if ((originalProduct && originalProduct.price !== formattedValues.price.toString()) || !originalProduct) 
+            formData.append('price', formattedValues.price.toString());
 
+        if ((originalProduct && originalProduct.description !== formattedValues.description )|| !originalProduct)
+            formData.append('description', formattedValues.description);
+
+        if ((originalProduct && originalProduct.currency !== formattedValues.currency )|| !originalProduct)
+            formData.append('currency', formattedValues.currency);
+
+        if ((originalProduct && originalProduct.stock !== formattedValues.stock.toString()) || !originalProduct)
+            formData.append('stock', formattedValues.stock.toString());
+
+        if ((originalProduct && originalProduct.weigth !== formattedValues.weigth.toString()) || !originalProduct)
+            formData.append('weigth', formattedValues.weight.toString());
+        
+        if ((originalProduct && originalProduct.measurement !== formattedValues.measurement) || !originalProduct)
+            formData.append('measurement', formattedValues.measurement);
+
+        if ((originalProduct && originalProduct.caducityDate.toString() !== formattedValues.caducityDate.toString()) || !originalProduct)
+            formData.append('caducityDate', formattedValues.caducityDate.toString());
+
+        console.log('formData stock', formData.get('stock')? formData.get('stock') : 'no stock');
         // Agregar archivos al FormData
         formattedValues.images.forEach((file: File) => {
             formData.append('images', file);
         });
 
-        console.log('formData', formData);
-
         try {
             if (id) {
-                console.log('update');
-                return;
+                console.log('formattedValues', formData);
+                const api = ProductInstanceApi.getInstance();
+                const response = await api.patch(`/update/${id}`, formData);
+                console.log(response);
             } else {
+
                 const api = ProductInstanceApi.getInstance();
                 const response = await api.post('/create', formData);
                 console.log(response);
@@ -106,6 +123,19 @@ const useProductForm = (idProduct?: string) => {
             const response = await api.get<ProductDetails>(`/${id}`);
             // console.log(response.data);
             setInitialProduct({
+                id: response.data.id,
+                name: response.data.name,
+                price: response.data.price.toString(),
+                description: response.data.description,
+                caducityDate: formatDateForInput(response.data.caducityDate),
+                stock: response.data.stock.toString(),
+                images: [], // Add an empty array or fetch the images if available
+                imagesUrl: response.data.images,
+                currency: response.data.currency,
+                weigth: response.data.weigth.toString(),
+                measurement: response.data.measurement,
+            });
+            setOriginalProduct({
                 id: response.data.id,
                 name: response.data.name,
                 price: response.data.price.toString(),

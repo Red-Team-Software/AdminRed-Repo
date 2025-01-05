@@ -68,7 +68,7 @@ function BundleForm({ id, isOpen, onOpen }: ModalFormProps) {
                                 errors.measurement = "Required";
                             }
 
-                            if (!values.images || values.images.length < 1) {
+                            if (!id && (!values.images || values.images.length === 0)) {
                                 errors.images = "Required";
                             }
 
@@ -86,7 +86,10 @@ function BundleForm({ id, isOpen, onOpen }: ModalFormProps) {
                             await saveBundleApi(values, id);
 
                             setSubmitting(false);
-                            if (isErrorSaving) onOpen();
+                            
+                            if (!isErrorSaving && !errorSaving) {
+                                alert("Product saved successfully");
+                            }
                         }}
                     >
                         {({
@@ -224,7 +227,8 @@ function BundleForm({ id, isOpen, onOpen }: ModalFormProps) {
                                             return errors.images.toString();
                                     }}
                                 />
-                                {values.images.length === 0 ? (
+
+                                {values.images.length === 0 && !id ? (
                                     <div className="text-red-500 text-sm">Must provide an image</div>
                                 ) : null}
                                 <div className="flex flex-row gap-3">
@@ -314,7 +318,7 @@ function BundleForm({ id, isOpen, onOpen }: ModalFormProps) {
                                         size="lg"
                                         color="success"
                                         type="submit"
-                                        disabled={!isValid || isSubmitting || isFetching || errorSaving ? true : false || id ? true : false}
+                                        disabled={!isValid || isSubmitting || isFetching || errorSaving ? true : false}
                                         className="text-white disabled:bg-slate-400"
                                     >
                                         Save

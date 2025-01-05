@@ -6,6 +6,7 @@ import { DateValue } from '@nextui-org/react';
 import { parseDate, CalendarDate } from '@internationalized/date';
 import BundleInstanceApi from '@/api/bundle-instance-api';
 import ProductInstanceApi from '@/api/product-instance-api';
+import { json } from 'stream/consumers';
 
 
 
@@ -42,6 +43,7 @@ const useBundleForm = (idBundle?: string) => {
         stock: "1",
         products: [],
     });
+    const [ originalBundle, setOriginalBundle ] = useState<BundleFormValues | null>(null);
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isError, setIsError] = useState<boolean>(false);
@@ -55,33 +57,59 @@ const useBundleForm = (idBundle?: string) => {
         setIsLoading(true);
         setError(null);
         setIsError(false);
+        const formattedValues = {
+            ...bundle,
+            price: parseFloat(bundle.price),
+            stock: parseInt(bundle.stock),
+            weight: parseFloat(bundle.weigth),
+            caducityDate: bundle.caducityDate.toString(),
+            // images: values.images.map((file: File) => file.name)
+        };
 
-        const formattedValues = new FormData();
-        formattedValues.append('name', bundle.name);
-        formattedValues.append('description', bundle.description);
-        formattedValues.append('caducityDate', bundle.caducityDate.toString());
-        formattedValues.append('stock', bundle.stock);
-        formattedValues.append('price', bundle.price);
-        formattedValues.append('currency', bundle.currency.toLocaleLowerCase());
-        formattedValues.append('weigth', bundle.weigth);
-        formattedValues.append('measurement', bundle.measurement);
-        bundle.products.forEach((product) => {
-            formattedValues.append('productId', product.id);
+
+        const formData = new FormData();
+
+        if ((originalBundle && originalBundle.name !== formattedValues.name)|| !originalBundle) 
+            formData.append('name', formattedValues.name);
+
+        if ((originalBundle && originalBundle.price !== formattedValues.price.toString() )|| !originalBundle) 
+            formData.append('price', formattedValues.price.toString());
+
+        if ( (originalBundle && originalBundle.description !== formattedValues.description) || !originalBundle)
+            formData.append('description', formattedValues.description);
+
+        if ( (originalBundle && originalBundle.currency !== formattedValues.currency) || !originalBundle)
+            formData.append('currency', formattedValues.currency);
+
+        if ( (originalBundle && originalBundle.stock !== formattedValues.stock.toString()) || !originalBundle)
+            formData.append('stock', formattedValues.stock.toString());
+
+        if ( (originalBundle && originalBundle.weigth !== formattedValues.weigth.toString()) || !originalBundle)
+            formData.append('weigth', formattedValues.weight.toString());
+        
+        if ( (originalBundle && originalBundle.measurement !== formattedValues.measurement) || !originalBundle)
+            formData.append('measurement', formattedValues.measurement);
+
+        if ( (originalBundle && originalBundle.caducityDate.toString() !== formattedValues.caducityDate.toString()) || !originalBundle)
+            formData.append('caducityDate', formattedValues.caducityDate.toString());
+
+        formattedValues.products.forEach((product) => {
+            formData.append('productId', product.id);
         });
 
-        bundle.images.forEach((image) => {
-            formattedValues.append('images', image);
+        // Agregar archivos al FormData
+        formattedValues.images.forEach((file: File) => {
+            formData.append('images', file);
+
         });
-
-        console.log('formated values',formattedValues);
-
         try {
             if (id) {
-                console.log('update');
-                return;
+                const bundleInstanceApi = BundleInstanceApi.getInstance();
+                const response = await bundleInstanceApi.patch(`/update/${id}`, formData);
+                console.log(response);
             } else {
                 const bundleInstanceApi = BundleInstanceApi.getInstance();
-                const response = await bundleInstanceApi.post('/create', formattedValues);
+                const response = await bundleInstanceApi.post('/create', formData);
                 console.log(response);
             }
         } catch (err: any) {
@@ -103,6 +131,20 @@ const useBundleForm = (idBundle?: string) => {
             const bundleInstanceApi = BundleInstanceApi.getInstance();
             const response = await bundleInstanceApi.get<BundleDetails>(`/${id}`);
             setInitialBundle({
+                id: response.data.id,
+                name: response.data.name,
+                caducityDate: formatDateForInput(response.data.caducityDate),
+                description: response.data.description,
+                price: response.data.price.toString(),
+                currency: response.data.currency,
+                images: [],
+                weigth: response.data.weigth.toString(),
+                measurement: response.data.measurement,
+                stock: response.data.stock.toString(),
+                products: response.data.products,
+            });
+
+            setOriginalBundle({
                 id: response.data.id,
                 name: response.data.name,
                 caducityDate: formatDateForInput(response.data.caducityDate),

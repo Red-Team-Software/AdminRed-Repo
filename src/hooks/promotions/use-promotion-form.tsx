@@ -54,7 +54,7 @@ const usePromotionForm = (idPromotion?: string) => {
         const formattedValues: any = {
             name: promotion.name,
             description: promotion.description,
-            avaleableState: promotion.avaleableState === 'YES' ? true : false,
+            state: promotion.avaleableState === 'YES' ? 'avaleable' : 'unabaleable',
             discount: parseFloat(promotion.discount) / 100,
         };
 

@@ -45,9 +45,9 @@ function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
                             if (
                                 !values.name ||
                                 values.name.trim() === "" ||
-                                values.name.length < 3
+                                values.name.length < 5
                             ) {
-                                errors.name = "Required and must be at least 3 characters";
+                                errors.name = "Required and must be at least 5 characters";
                             }
                             if (
                                 !values.description ||
@@ -76,7 +76,7 @@ function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
                                 errors.measurement = "Required";
                             }
 
-                            if (!values.images || values.images.length === 0) {
+                            if (!id && (!values.images || values.images.length === 0)) {
                                 errors.images = "Required";
                             }
 
@@ -88,8 +88,10 @@ function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
                             // console.log(values);
                             await saveProductApi(values, id);
                             setSubmitting(false);
-                            if ( !isErrorSaving ) onOpen();
 
+                            if (!isErrorSaving && !errorSaving) {
+                                alert("Product saved successfully");
+                            }
                         }}
                     >
                         {({
@@ -216,7 +218,7 @@ function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
                                     />
                                 </div>
                                 <Input
-                                    isRequired
+                                    isRequired={id ? false : true}
                                     type="file"
                                     name="images"
                                     label="Images"
@@ -227,10 +229,20 @@ function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
                                             return errors.images.toString();
                                     }}
                                 />
-                                {values.images.length === 0 ? (
+                                {values.images.length === 0 && !id ? (
                                     <div className="text-red-500 text-sm">Must provide an image</div>
-                                ): null}
+                                ) : null}
                                 <div className="flex flex-row gap-3">
+                                    {initialProduct.imagesUrl &&
+                                        initialProduct.imagesUrl.map((image: any, index: number) => (
+                                            <Image
+                                                key={index}
+                                                src={image}
+                                                alt="product"
+                                                width={40}
+                                                height={40}
+                                            />
+                                        ))}
                                     {values.images &&
                                         values.images.map((image: any, index: number) => (
                                             <Image
@@ -247,7 +259,7 @@ function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
                                     <p className="text-sm text-gray-500 mt-4">Double click to remove image</p>
                                     : null
                                 }
-                                
+
                                 <ModalFooter className="flex justify-center py-4">
                                     {isSubmitting && (
                                         <div className="flex justify-center">
@@ -264,7 +276,7 @@ function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
                                         size="lg"
                                         color="success"
                                         type="submit"
-                                        disabled={!isValid || isSubmitting || isFetching || errorSaving ? true : false || id ? true : false}
+                                        disabled={!isValid || isSubmitting || isFetching || errorSaving ? true : false}
                                         className="text-white disabled:bg-slate-400"
                                     >
                                         Save
