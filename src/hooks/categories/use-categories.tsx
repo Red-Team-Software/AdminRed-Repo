@@ -26,7 +26,7 @@ const useCategories = () => {
 
         try {
             const categoryInstanceApi = CategoryInstanceApi.getInstance();
-            const response = await categoryInstanceApi.get<ICategoryResponse[]>('/all',{
+            const response = await categoryInstanceApi.get<ICategoryResponse[]>('/many',{
                 params: {
                     page,
                     perPage: 10,
