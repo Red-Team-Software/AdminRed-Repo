@@ -16,14 +16,14 @@ const formatDateForInput = (dateString: string): DateValue => {
 
 export interface BundleFormValues {
     id?: string;
+    name: string;
     description: string;
     caducityDate: DateValue;
-    name: string;
     stock: string;
     images: File[];
     price: string;
     currency: string;
-    weigth: string;
+    weight: string;
     measurement: string;
     products: Item[];
 }
@@ -37,7 +37,7 @@ const useBundleForm = (idBundle?: string) => {
         price: "5.00",
         currency: "usd",
         images: [],
-        weigth: '1',
+        weight: '1',
         measurement: "kg",
         stock: "1",
         products: [],
@@ -60,9 +60,8 @@ const useBundleForm = (idBundle?: string) => {
             ...bundle,
             price: parseFloat(bundle.price),
             stock: parseInt(bundle.stock),
-            weight: parseFloat(bundle.weigth),
+            weight: parseFloat(bundle.weight),
             caducityDate: bundle.caducityDate.toString(),
-            // images: values.images.map((file: File) => file.name)
         };
 
 
@@ -83,7 +82,7 @@ const useBundleForm = (idBundle?: string) => {
         if ( (originalBundle && originalBundle.stock !== formattedValues.stock.toString()) || !originalBundle)
             formData.append('stock', formattedValues.stock.toString());
 
-        if ( (originalBundle && originalBundle.weigth !== formattedValues.weigth.toString()) || !originalBundle)
+        if ( (originalBundle && originalBundle.weight !== formattedValues.weight.toString()) || !originalBundle)
             formData.append('weigth', formattedValues.weight.toString());
         
         if ( (originalBundle && originalBundle.measurement !== formattedValues.measurement) || !originalBundle)
@@ -97,10 +96,14 @@ const useBundleForm = (idBundle?: string) => {
         });
 
         // Agregar archivos al FormData
-        formattedValues.images.forEach((file: File) => {
-            formData.append('images', file);
+        if(formattedValues.images && formattedValues.images.length > 0) {
+            formattedValues.images.forEach((file: File) => {
+                formData.append('images', file);
+            });
+        }
 
-        });
+        // console.log('imagenes a enviar: ', formData.getAll('images') ? formData.get('images') : 'no hay imagenes');
+
         try {
             if (id) {
                 const bundleInstanceApi = BundleInstanceApi.getInstance();
@@ -137,7 +140,7 @@ const useBundleForm = (idBundle?: string) => {
                 price: response.data.price.toString(),
                 currency: response.data.currency,
                 images: [],
-                weigth: response.data.weigth.toString(),
+                weight: response.data.weight.toString(),
                 measurement: response.data.measurement,
                 stock: response.data.stock.toString(),
                 products: response.data.products,
@@ -151,7 +154,7 @@ const useBundleForm = (idBundle?: string) => {
                 price: response.data.price.toString(),
                 currency: response.data.currency,
                 images: [],
-                weigth: response.data.weigth.toString(),
+                weight: response.data.weight.toString(),
                 measurement: response.data.measurement,
                 stock: response.data.stock.toString(),
                 products: response.data.products,

@@ -10,6 +10,7 @@ import {
     Textarea,
     ModalFooter,
     DateInput,
+    Spinner,
 } from "@nextui-org/react";
 import { Form, Formik, FormikErrors } from "formik";
 import ReactDOM from "react-dom";
@@ -106,6 +107,17 @@ function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
                             setFieldValue,
                         }) => (
                             <Form onSubmit={handleSubmit} className="flex flex-col gap-3">
+
+                                {
+                                    isErrorSaving && <div className="text-red-500 text-center">{errorSaving}</div>
+                                }
+
+                                {
+                                    isFetching && <div className="text-center">
+                                        Loading...
+                                        <Spinner/>
+                                    </div>
+                                }
 
                                 <Input
                                     type="text"

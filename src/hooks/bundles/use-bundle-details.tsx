@@ -10,18 +10,18 @@ interface IPromotions {
 }
 
 export interface BundleDetails {
-    id: string;
-    description: string;
-    caducityDate: string;
+    id?: string;
     name: string;
-    stock: number;
+    description: string;
     images: string[];
     price: number;
     currency: string;
-    weigth: number;
     measurement: string;
-    categories: [];
-    promotion: IPromotions[];
+    weight: number;
+    stock: number;
+    caducityDate: string;
+    category: [];
+    discount: IPromotions[];
     products: Item[];
 }
 

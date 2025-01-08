@@ -12,7 +12,7 @@ import useShowList from "@/hooks/use-showlist";
 
 export default function ProductsPage() {
 
-  const { products, isLoading, error, page, handlePage, deleteProduct } = useProducts();
+  const { products, isLoading, error, page, handlePage, deleteProduct, fetchProducts } = useProducts();
 
   const {isModalOpen, modalTargetState ,selectedItem, handleCloseModal, handleOpenModal } = useShowList<Product>(products);
 
@@ -75,14 +75,20 @@ export default function ProductsPage() {
       {isModalOpen && modalTargetState === ModalTarget.INSERT && (
         <ProductForm
           isOpen={isModalOpen}
-          onOpen={handleCloseModal}
+          onOpen={() => {
+            handleCloseModal()
+            fetchProducts()
+          }}
         />
       )} 
 
       {isModalOpen && modalTargetState === ModalTarget.EDIT && (
         <ProductForm
         isOpen={isModalOpen}
-        onOpen={handleCloseModal}
+        onOpen={() => {
+          handleCloseModal()
+          fetchProducts()
+        }}
         id={selectedItem!.id}
       />
       )} 

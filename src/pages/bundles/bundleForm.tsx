@@ -5,7 +5,7 @@ import useBundleForm, { BundleFormValues } from '@/hooks/bundles/use-bundle-form
 import { ModalFormProps } from '@/types'
 import { Button } from '@nextui-org/button';
 import { Textarea } from '@nextui-org/input';
-import { Modal, ModalContent, ModalHeader, ModalBody, DateInput, ModalFooter, Input, Listbox, ListboxItem, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Image } from '@nextui-org/react';
+import { Modal, ModalContent, ModalHeader, ModalBody, DateInput, ModalFooter, Input, Listbox, ListboxItem, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Image, Spinner } from '@nextui-org/react';
 import { Formik, FormikErrors, Form } from 'formik';
 import ReactDOM from 'react-dom';
 
@@ -60,8 +60,8 @@ function BundleForm({ id, isOpen, onOpen }: ModalFormProps) {
                                 errors.stock = "Required and must be greater than 1";
                             }
 
-                            if (!values.weigth || parseFloat(values.weigth) < 1) {
-                                errors.weigth = "Required and must be greater than 1";
+                            if (!values.weight || parseFloat(values.weight) < 1) {
+                                errors.weight = "Required and must be greater than 1";
                             }
 
                             if (!values.measurement) {
@@ -105,6 +105,16 @@ function BundleForm({ id, isOpen, onOpen }: ModalFormProps) {
                         }) => (
                             <Form onSubmit={handleSubmit} className="flex flex-col gap-3">
 
+                                {
+                                    isErrorSaving && <div className="text-red-500 text-center">{errorSaving}</div>
+                                }
+
+                                {
+                                    isFetching && <div className="text-center">
+                                        Loading...
+                                        <Spinner/>
+                                    </div>
+                                }
                                 <Input
                                     type="text"
                                     name="name"
@@ -194,11 +204,11 @@ function BundleForm({ id, isOpen, onOpen }: ModalFormProps) {
                                         name="weigth"
                                         label="Weigth"
                                         placeholder="0.00"
-                                        value={values.weigth}
+                                        value={values.weight}
                                         onBlur={handleBlur}
                                         onChange={handleChange}
                                         validate={() => {
-                                            if (errors.weigth && touched.weigth) return errors.weigth;
+                                            if (errors.weight && touched.weight) return errors.weight;
                                         }}
                                     />
                                     <Input

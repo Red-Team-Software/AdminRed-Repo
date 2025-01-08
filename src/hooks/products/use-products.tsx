@@ -4,9 +4,8 @@ import { useState, useEffect } from 'react';
 export interface Product {
     id: string;
     name: string;
-    description: string;
     price: number;
-    images: string[];
+    image: string[];
     currency: string;
 }
 
@@ -71,7 +70,7 @@ const useProducts = () => {
         }
     }
 
-    return { products, isLoading, error, page, handlePage, deleteProduct };
+    return { products, isLoading, error, page, handlePage, deleteProduct, fetchProducts };
 };
 
 export default useProducts;

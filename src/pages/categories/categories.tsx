@@ -11,7 +11,7 @@ import CategoryForm from "./categoryForm";
 
 function CategoriesPage() {
 
-  const { categories, isLoading, error, page, handlePage, deleteCategory } = useCategories();
+  const { categories, isLoading, error, page, handlePage, deleteCategory, fetchCategories } = useCategories();
 
   const { isModalOpen, modalTargetState, selectedItem, handleCloseModal, handleOpenModal } = useShowList<Category>(categories);
 
@@ -56,7 +56,7 @@ function CategoriesPage() {
                   </TableRow>
                 ))}
               </TableBody>
-            ) : <TableBody emptyContent={`No promotions to show`}>{[]}</TableBody>}
+            ) : <TableBody emptyContent={`No categories to show`}>{[]}</TableBody>}
           </Table>
 
 
@@ -80,7 +80,10 @@ function CategoriesPage() {
       {isModalOpen && modalTargetState === ModalTarget.INSERT && (
         <CategoryForm
           isOpen={isModalOpen}
-          onOpen={handleCloseModal}
+          onOpen={() => {
+            handleCloseModal();
+            fetchCategories();
+          }}
         />
       )}
 
@@ -88,7 +91,12 @@ function CategoriesPage() {
       {isModalOpen && modalTargetState === ModalTarget.EDIT && (
         <CategoryForm
           isOpen={isModalOpen}
-          onOpen={handleCloseModal}
+          onOpen={
+            () => {
+              handleCloseModal();
+              fetchCategories();
+            }
+          }
           id={selectedItem!.id}
         />
       )}
