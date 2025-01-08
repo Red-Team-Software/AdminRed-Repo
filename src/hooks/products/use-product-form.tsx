@@ -85,11 +85,13 @@ const useProductForm = (idProduct?: string) => {
         if ((originalProduct && originalProduct.caducityDate.toString() !== formattedValues.caducityDate.toString()) || !originalProduct)
             formData.append('caducityDate', formattedValues.caducityDate.toString());
 
-        console.log('formData stock', formData.get('stock')? formData.get('stock') : 'no stock');
+        // console.log('formData stock', formData.get('stock')? formData.get('stock') : 'no stock');
+
         // Agregar archivos al FormData
-        formattedValues.images.forEach((file: File) => {
-            formData.append('images', file);
-        });
+        if (formattedValues.images.length > 0)
+            formattedValues.images.forEach((file: File) => {
+                formData.append('images', file);
+            });
 
         try {
             if (id) {
@@ -132,7 +134,7 @@ const useProductForm = (idProduct?: string) => {
                 images: [], // Add an empty array or fetch the images if available
                 imagesUrl: response.data.images,
                 currency: response.data.currency,
-                weigth: response.data.weigth.toString(),
+                weigth: response.data.weight.toString(),
                 measurement: response.data.measurement,
             });
             setOriginalProduct({
@@ -145,7 +147,7 @@ const useProductForm = (idProduct?: string) => {
                 images: [], // Add an empty array or fetch the images if available
                 imagesUrl: response.data.images,
                 currency: response.data.currency,
-                weigth: response.data.weigth.toString(),
+                weigth: response.data.weight.toString(),
                 measurement: response.data.measurement,
             });
         } catch (err: any) {

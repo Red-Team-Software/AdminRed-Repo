@@ -56,7 +56,7 @@ export default function ProductDetailsPage({ id, isOpen, onOpen }: DetailsPagePr
 
                             <div className="my-4 flex gap-4 items-end">
                                 <h2 className="text-lg lg:text-xl text-default-600 block">Weight:</h2>
-                                <p className={title({ size: "sm", color: "yellow" })}>{product.weigth} {product.measurement}</p>
+                                <p className={title({ size: "sm", color: "yellow" })}>{product.weight} {product.measurement}</p>
                             </div>
 
                             <h2 className={subtitle()}>Promotions:</h2>
@@ -67,7 +67,7 @@ export default function ProductDetailsPage({ id, isOpen, onOpen }: DetailsPagePr
                                     variant="faded"
                                 //onSelectionChange={setSelectedKeys}
                                 >
-                                    {product.promotion.map((item, index) => (
+                                    {product.discount.map((item, index) => (
                                         <ListboxItem key={index} >{item.name} - {item.discount * 100}%</ListboxItem>
                                     ))}
                                 </Listbox>

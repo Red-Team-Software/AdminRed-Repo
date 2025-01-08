@@ -44,7 +44,7 @@ function BundleDetailsPage({ id, isOpen, onOpen }: DetailsPageProps) {
 
                             <div className="my-4 flex gap-4 items-end">
                                 <h2 className="text-lg lg:text-xl text-default-600 block">Weight:</h2>
-                                <p className={title({ size: "sm", color: "yellow" })}>{bundle.weigth} {bundle.measurement}</p>
+                                <p className={title({ size: "sm", color: "yellow" })}>{bundle.weight} {bundle.measurement}</p>
                             </div>
 
                             <h2 className={subtitle()}>Products:</h2>
@@ -69,7 +69,7 @@ function BundleDetailsPage({ id, isOpen, onOpen }: DetailsPageProps) {
                                     variant="faded"
                                 //onSelectionChange={setSelectedKeys}
                                 >
-                                    {bundle.promotion.map((item, index) => (
+                                    {bundle.discount.map((item, index) => (
                                         <ListboxItem key={index} >{item.name} - {item.discount * 100}%</ListboxItem>
                                     ))}
                                 </Listbox>

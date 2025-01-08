@@ -49,6 +49,7 @@ const useBundles = () => {
             await bundleInstanceApi.delete(`/delete/${id}`);
             fetchBundles();
         } catch (err: any) {
+            console.error(err);
             setError(err.message);
         } finally {
             setIsLoading(false);
@@ -70,7 +71,7 @@ const useBundles = () => {
         }
     }
 
-    return { bundles, isLoading, error, page, handlePage, deleteBundle };
+    return { bundles, isLoading, error, page, handlePage, deleteBundle, fetchBundles };
 };
 
 export default useBundles;

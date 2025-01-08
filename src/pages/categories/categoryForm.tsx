@@ -3,7 +3,7 @@ import { ListboxWrapper } from '@/components/listbox-wrapper';
 import { title } from '@/components/primitives';
 import useCategoryForm, { CategoryFormValues } from '@/hooks/categories/use-category-form';
 import { ModalFormProps } from '@/types';
-import { Image, Button, Input, Listbox, ListboxItem, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@nextui-org/react';
+import { Image, Button, Input, Listbox, ListboxItem, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Spinner } from '@nextui-org/react';
 import { Form, Formik, FormikErrors } from 'formik';
 import ReactDOM from 'react-dom';
 
@@ -15,7 +15,7 @@ export default function CategoryForm({ id, isOpen, onOpen }: ModalFormProps) {
     return ReactDOM.createPortal(
         <Modal isOpen={isOpen} scrollBehavior="inside" size="4xl" onClose={onOpen}>
             <ModalContent>
-                <ModalHeader className={`${title({ size: "sm" })} text-center`}>{id ? "Edit" : "Create"} Promotion Form</ModalHeader>
+                <ModalHeader className={`${title({ size: "sm" })} text-center`}>{id ? "Edit" : "Create"} Category Form</ModalHeader>
                 <ModalBody>
                     <Formik
                         enableReinitialize={true}
@@ -28,7 +28,7 @@ export default function CategoryForm({ id, isOpen, onOpen }: ModalFormProps) {
                                 errors.name = "Name is required and must be at least 3 characters";
                             }
 
-                            if (!values.image) {
+                            if (!values.image && !id) {
                                 errors.image = "Image is required";
                             }
 
@@ -43,7 +43,7 @@ export default function CategoryForm({ id, isOpen, onOpen }: ModalFormProps) {
                         onSubmit={async (values, { setSubmitting }) => {
                             setSubmitting(true);
                             await saveCategoryApi(values, id);
-                            if (!isErrorSaving) onOpen();
+                            alert('Category saved');
                             setSubmitting(false);
                         }}
                     >
@@ -59,6 +59,17 @@ export default function CategoryForm({ id, isOpen, onOpen }: ModalFormProps) {
                             isValid,
                         }) => (
                             <Form onSubmit={handleSubmit} className="flex flex-col gap-3">
+                                
+                                {
+                                    isErrorSaving && <div className="text-red-500 text-center">{errorSaving}</div>
+                                }
+
+                                {
+                                    isFetching && <div className="text-center">
+                                        Loading...
+                                        <Spinner/>
+                                    </div>
+                                }
 
                                 <Input
                                     isRequired
@@ -167,7 +178,7 @@ export default function CategoryForm({ id, isOpen, onOpen }: ModalFormProps) {
                                                                         setFieldValue('products', [...values.products, item]);
                                                                     }
                                                                     if (itemType.id === '2') {
-                                                                        if (values.products.find((p) => p.id === item.id)) return;
+                                                                        if (values.bundles.find((p) => p.id === item.id)) return;
                                                                         setFieldValue('bundles', [...values.bundles, item]);
                                                                     }
 
@@ -198,7 +209,7 @@ export default function CategoryForm({ id, isOpen, onOpen }: ModalFormProps) {
                                         size="lg"
                                         color="success"
                                         type="submit"
-                                        disabled={!isValid || isSubmitting || isFetching || errorSaving ? true : false || id ? true : false}
+                                        disabled={ !isValid || isSubmitting || isFetching || errorSaving ? true : false }
                                         className="text-white disabled:bg-slate-400"
                                     >
                                         Save

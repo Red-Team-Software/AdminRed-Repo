@@ -65,7 +65,7 @@ const useCategories = () => {
         fetchCategories();
     }, [page]);
 
-    return { categories, page, isLoading, error, handlePage, deleteCategory };
+    return { categories, page, isLoading, error, handlePage, deleteCategory, fetchCategories };
 };
 
 export default useCategories;

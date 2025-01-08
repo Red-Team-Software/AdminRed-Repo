@@ -6,6 +6,7 @@ import ProductInstanceApi from "@/api/product-instance-api";
 import BundleInstanceApi from "@/api/bundle-instance-api";
 
 import { CategoryDetails } from "./use-category-details";
+import { Bundle } from "../bundles/use-bundles";
 
 export interface CategoryFormValues {
 	id?: string;
@@ -23,6 +24,9 @@ const useCategoryForm = (idCategory?: string) => {
 		products: [],
 		bundles: [],
 	});
+
+	const [originalCategory, setOriginalCategory] =
+		useState<CategoryFormValues | null>(null);
 
 	const ItemsTypeList: Item[] = [
 		{ id: "1", name: "Products" },
@@ -42,32 +46,59 @@ const useCategoryForm = (idCategory?: string) => {
 		setError(null);
 
 		const formData = new FormData();
-		formData.append("name", category.name);
-		formData.append("image", category.image);
-		formData.append(
-			"productos",
-			category.products.map((product) => product.id).join(",")
-		);
-		// formData.append('bundles', JSON.stringify(category.bundles));
+		if (
+			(originalCategory && originalCategory.name === category.name) ||
+			!originalCategory
+		) {
+			formData.append("name", category.name);
+		}
 
-		console.log("formData", formData);
+		if (category.image) {
+			formData.append("image", category.image);
+		}
 
-		// try {
-		//     if (id) {
-		//         console.log('update');
-		//         return;
-		//     } else {
-		//         const categoryInstanceApi = CategoryInstanceApi.getInstance();
-		//         const response = await categoryInstanceApi.post('/create', formData);
-		//         console.log(response);
-		//     }
-		// } catch (err: any) {
-		//     console.log(err);
-		//     setIsError(true);
-		//     setError('Error saving category: ' + err.response.data.message,);
-		// } finally {
-		//     setIsLoading(false);
-		// }
+		if (
+			(originalCategory &&
+				originalCategory.products.length !== category.products.length) ||
+			!originalCategory
+		) {
+			category.products.forEach((product) => {
+				formData.append("products", product.id);
+			});
+		}
+
+		if (
+			(originalCategory &&
+				originalCategory.bundles.length !== category.bundles.length) ||
+			!originalCategory
+		) {
+			category.bundles.forEach((bundle) => {
+				formData.append("bundles", bundle.id);
+			});
+		}
+
+		console.log(...formData);
+
+		try {
+			if (id) {
+				const categoryInstanceApi = CategoryInstanceApi.getInstance();
+				const response = await categoryInstanceApi.patch(
+					`/update/${id}`,
+					formData
+				);
+				console.log(response);
+			} else {
+				const categoryInstanceApi = CategoryInstanceApi.getInstance();
+				const response = await categoryInstanceApi.post("/create", formData);
+				console.log(response);
+			}
+		} catch (err: any) {
+			console.log(err);
+			setIsError(true);
+			setError("Error saving category: " + err.response.data.message);
+		} finally {
+			setIsLoading(false);
+		}
 	};
 
 	const _getCategoryToEdit = async (id: string) => {
@@ -82,7 +113,14 @@ const useCategoryForm = (idCategory?: string) => {
 				name: response.data.name,
 				image: new File([], ""),
 				products: response.data.products,
-				bundles: [],
+				bundles: response.data.bundles,
+			});
+			setOriginalCategory({
+				id: response.data.id,
+				name: response.data.name,
+				image: new File([], ""),
+				products: response.data.products,
+				bundles: response.data.bundles,
 			});
 		} catch (err: any) {
 			console.error(err);
@@ -129,8 +167,20 @@ const useCategoryForm = (idCategory?: string) => {
 			}
 			if (itemId === "2") {
 				const bundleInstanceApi = BundleInstanceApi.getInstance();
-				console.log("fetching bundles", bundleInstanceApi.toString());
-				setItemsFetched([]);
+				const response = await bundleInstanceApi.get<Bundle[]>("/many", {
+					params: {
+						page,
+						perPage: 7,
+					},
+				});
+
+				const products: Item[] = response.data.map((product) => {
+					return {
+						id: product.id,
+						name: product.name,
+					};
+				});
+				setItemsFetched(products);
 			}
 		} catch (err: any) {
 			console.error(err);
