@@ -41,7 +41,7 @@ function PromotionsPage() {
                                 {promotions.map((prom) => (
                                     <TableRow key={prom.id}>
                                         <TableCell>{prom.name}</TableCell>
-                                        <TableCell>{ prom.avaleableState? 'Si' : 'No' }</TableCell>
+                                        <TableCell>{ prom.state === 'avaleable'? 'Si' : 'No' }</TableCell>
                                         <TableCell>{prom.discount * 100} %</TableCell>
                                         <TableCell className="flex gap-1 items-center">
                                             <Button color="primary" size="sm" variant="flat" onPress={() => handleOpenModal(ModalTarget.VIEW, prom.id)}>View</Button>
