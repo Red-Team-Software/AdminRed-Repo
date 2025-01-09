@@ -1,42 +1,29 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Item } from '@/types';
 import { Product } from '../products/use-products';
 import { BundleDetails } from './use-bundle-details';
 import { DateValue } from '@nextui-org/react';
 import { parseDate, CalendarDate } from '@internationalized/date';
+import BundleInstanceApi from '@/api/bundle-instance-api';
+import ProductInstanceApi from '@/api/product-instance-api';
 
-const apiUrl = import.meta.env.VITE_APIURL;
+
 
 const formatDateForInput = (dateString: string): DateValue => {
     const date = new Date(dateString);
     return parseDate(date.toISOString().split('T')[0]);
 };
 
-const axiosInstance = axios.create({
-    baseURL: apiUrl + '/bundle',
-    headers: {
-        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-    },
-});
-
-const axiosInstanceItems = axios.create({
-    baseURL: apiUrl + '/product',
-    headers: {
-        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-    },
-});
-
 export interface BundleFormValues {
     id?: string;
+    name: string;
     description: string;
     caducityDate: DateValue;
-    name: string;
     stock: string;
     images: File[];
     price: string;
     currency: string;
-    weigth: string;
+    weight: string;
     measurement: string;
     products: Item[];
 }
@@ -50,13 +37,16 @@ const useBundleForm = (idBundle?: string) => {
         price: "5.00",
         currency: "usd",
         images: [],
-        weigth: '1',
+        weight: '1',
         measurement: "kg",
         stock: "1",
         products: [],
     });
+    const [ originalBundle, setOriginalBundle ] = useState<BundleFormValues | null>(null);
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isError, setIsError] = useState<boolean>(false);
+
     const [error, setError] = useState<string | null>(null);
     const [itemsFetched, setItemsFetched] = useState<Item[]>([]);
     const [page, setPage] = useState<number>(1);
@@ -65,36 +55,68 @@ const useBundleForm = (idBundle?: string) => {
     const saveBundle = async (bundle: BundleFormValues, id?: string) => {
         setIsLoading(true);
         setError(null);
+        setIsError(false);
+        const formattedValues = {
+            ...bundle,
+            price: parseFloat(bundle.price),
+            stock: parseInt(bundle.stock),
+            weight: parseFloat(bundle.weight),
+            caducityDate: bundle.caducityDate.toString(),
+        };
 
-        const formattedValues = new FormData();
-        formattedValues.append('name', bundle.name);
-        formattedValues.append('description', bundle.description);
-        formattedValues.append('caducityDate', bundle.caducityDate.toString());
-        formattedValues.append('stock', bundle.stock);
-        formattedValues.append('price', bundle.price);
-        formattedValues.append('currency', bundle.currency.toLocaleLowerCase());
-        formattedValues.append('weigth', bundle.weigth);
-        formattedValues.append('measurement', bundle.measurement);
-        bundle.products.forEach((product) => {
-            formattedValues.append('productId', product.id);
+
+        const formData = new FormData();
+
+        if ((originalBundle && originalBundle.name !== formattedValues.name)|| !originalBundle) 
+            formData.append('name', formattedValues.name);
+
+        if ((originalBundle && originalBundle.price !== formattedValues.price.toString() )|| !originalBundle) 
+            formData.append('price', formattedValues.price.toString());
+
+        if ( (originalBundle && originalBundle.description !== formattedValues.description) || !originalBundle)
+            formData.append('description', formattedValues.description);
+
+        if ( (originalBundle && originalBundle.currency !== formattedValues.currency) || !originalBundle)
+            formData.append('currency', formattedValues.currency);
+
+        if ( (originalBundle && originalBundle.stock !== formattedValues.stock.toString()) || !originalBundle)
+            formData.append('stock', formattedValues.stock.toString());
+
+        if ( (originalBundle && originalBundle.weight !== formattedValues.weight.toString()) || !originalBundle)
+            formData.append('weigth', formattedValues.weight.toString());
+        
+        if ( (originalBundle && originalBundle.measurement !== formattedValues.measurement) || !originalBundle)
+            formData.append('measurement', formattedValues.measurement);
+
+        if ( (originalBundle && originalBundle.caducityDate.toString() !== formattedValues.caducityDate.toString()) || !originalBundle)
+            formData.append('caducityDate', formattedValues.caducityDate.toString());
+
+        formattedValues.products.forEach((product) => {
+            formData.append('productId', product.id);
         });
 
-        bundle.images.forEach((image) => {
-            formattedValues.append('images', image);
-        });
+        // Agregar archivos al FormData
+        if(formattedValues.images && formattedValues.images.length > 0) {
+            formattedValues.images.forEach((file: File) => {
+                formData.append('images', file);
+            });
+        }
 
-        console.log('formated values',formattedValues);
+        // console.log('imagenes a enviar: ', formData.getAll('images') ? formData.get('images') : 'no hay imagenes');
 
         try {
             if (id) {
-                console.log('update');
-                return;
+                const bundleInstanceApi = BundleInstanceApi.getInstance();
+                const response = await bundleInstanceApi.patch(`/update/${id}`, formData);
+                console.log(response);
             } else {
-                const response = await axiosInstance.post('/create', formattedValues);
+                const bundleInstanceApi = BundleInstanceApi.getInstance();
+                const response = await bundleInstanceApi.post('/create', formData);
                 console.log(response);
             }
         } catch (err: any) {
             console.log(err);
+            setIsError(true);
             setError('Error saving bundle: ' + err.response.data.message,);
         } finally {
             setIsLoading(false);
@@ -106,12 +128,10 @@ const useBundleForm = (idBundle?: string) => {
 
         setIsLoading(true);
         setError(null);
+        setIsError(false);
         try {
-            const response = await axiosInstance.get<BundleDetails>(``, {
-                params: {
-                    id: id,
-                },
-            });
+            const bundleInstanceApi = BundleInstanceApi.getInstance();
+            const response = await bundleInstanceApi.get<BundleDetails>(`/${id}`);
             setInitialBundle({
                 id: response.data.id,
                 name: response.data.name,
@@ -120,13 +140,28 @@ const useBundleForm = (idBundle?: string) => {
                 price: response.data.price.toString(),
                 currency: response.data.currency,
                 images: [],
-                weigth: response.data.weigth.toString(),
+                weight: response.data.weight.toString(),
+                measurement: response.data.measurement,
+                stock: response.data.stock.toString(),
+                products: response.data.products,
+            });
+
+            setOriginalBundle({
+                id: response.data.id,
+                name: response.data.name,
+                caducityDate: formatDateForInput(response.data.caducityDate),
+                description: response.data.description,
+                price: response.data.price.toString(),
+                currency: response.data.currency,
+                images: [],
+                weight: response.data.weight.toString(),
                 measurement: response.data.measurement,
                 stock: response.data.stock.toString(),
                 products: response.data.products,
             });
         } catch (err: any) {
             console.error(err);
+            setIsError(true);
             setError(err.message);
         } finally {
             setIsLoading(false);
@@ -144,9 +179,11 @@ const useBundleForm = (idBundle?: string) => {
 
         setIsLoading(true);
         setError(null);
+        setIsError(false);
 
         try {
-            const response = await axiosInstanceItems.get<Product[]>('/all', {
+            const productInstanceApi = ProductInstanceApi.getInstance();
+            const response = await productInstanceApi.get<Product[]>('/many', {
                 params: {
                     page,
                     perPage: 7,
@@ -163,6 +200,7 @@ const useBundleForm = (idBundle?: string) => {
             setItemsFetched(products);
         } catch (err: any) {
             console.error(err);
+            setIsError(true);
             setError(err.message);
         } finally {
             setIsLoading(false);
@@ -182,7 +220,7 @@ useEffect(() => {
 }, []);
 
 
-return { initialBundle, isFetching: isLoading, errorSaving: error, saveBundleApi: saveBundle, itemsFetched, handlePage, page };
+return { initialBundle, isFetching: isLoading, errorSaving: error, isErrorSaving: isError, saveBundleApi: saveBundle, itemsFetched, handlePage, page };
 };
 
 export default useBundleForm;

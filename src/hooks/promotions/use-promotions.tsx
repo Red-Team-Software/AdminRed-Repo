@@ -1,26 +1,16 @@
-import axios from 'axios';
+import PromotionInstanceApi from '@/api/promotion-instance-api';
 import { useEffect, useState } from 'react';
 
 export interface Promotion {
     id: string;
     description: string;
     name: string;
-    avaleableState: boolean;
+    state: string;
     discount: number;
     products: string[];
     bundles: string[];
     categories: string[];
 }
-
-
-const apiUrl = import.meta.env.VITE_APIURL;
-
-const axiosInstance = axios.create({
-    baseURL: apiUrl + '/promotion',
-    headers: {
-        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-    },
-});
 
 const usePromotions = () => {
 
@@ -34,13 +24,14 @@ const usePromotions = () => {
         setError(null);
 
         try {
-            const response = await axiosInstance.get<Promotion[]>('/all',{
+            const promotionInstanceApi = PromotionInstanceApi.getInstance();
+            const { data } = await promotionInstanceApi.get<Promotion[]>('/many',{
                 params: {
                     page,
                     perPage: 10,
                 },
             });
-            setPromotions(response.data);
+            setPromotions(data);
         } catch (err: any) {
             setError(err.message);
         } finally {
@@ -49,7 +40,7 @@ const usePromotions = () => {
     };
 
     function deletePromotion(id: string): void {
-        console.log('deletePromotion', id);
+        console.log('delete Promotion: ', id);
     }
 
     function handlePage(p: number): void {

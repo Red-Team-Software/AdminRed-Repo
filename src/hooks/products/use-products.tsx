@@ -1,22 +1,11 @@
+import ProductInstanceApi from '@/api/product-instance-api';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
-
-
-const apiUrl = import.meta.env.VITE_APIURL;
-
-const axiosInstance = axios.create({
-    baseURL: apiUrl + '/product',
-    headers: {
-        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-    },
-});
 
 export interface Product {
     id: string;
     name: string;
-    description: string;
     price: number;
-    images: string[];
+    image: string[];
     currency: string;
 }
 
@@ -31,7 +20,8 @@ const useProducts = () => {
         setError(null);
 
         try {
-            const response = await axiosInstance<Product[]>('/all', {
+            const api = ProductInstanceApi.getInstance();
+            const response = await api<Product[]>('/many', {
                 params: {
                     page,
                     perPage: 10,
@@ -42,6 +32,7 @@ const useProducts = () => {
             products = response.data.map(e => e)
             setProducts(products);
         } catch (err: any) {
+            console.log(err);
             setError(err.message);
         } finally {
             setIsLoading(false);
@@ -50,17 +41,18 @@ const useProducts = () => {
 
     const deleteProduct = async (id: string) => {
         console.log('deleteProduct', id);
-        // setIsLoading(true);
-        // setError(null);
+        setIsLoading(true);
+        setError(null);
 
-        // try {
-        //     await axiosInstance.delete(`/${id}`);
-        //     fetchProducts();
-        // } catch (err: any) {
-        //     setError(err.message);
-        // } finally {
-        //     setIsLoading(false);
-        // }
+        try {
+            const api = ProductInstanceApi.getInstance();
+            await api.delete(`/delete/${id}`);
+            fetchProducts();
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     useEffect(() => {
@@ -78,7 +70,7 @@ const useProducts = () => {
         }
     }
 
-    return { products, isLoading, error, page, handlePage, deleteProduct };
+    return { products, isLoading, error, page, handlePage, deleteProduct, fetchProducts };
 };
 
 export default useProducts;

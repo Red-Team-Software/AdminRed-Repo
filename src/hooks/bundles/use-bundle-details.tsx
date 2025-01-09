@@ -1,18 +1,7 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Item } from '@/types';
+import BundleInstanceApi from '@/api/bundle-instance-api';
 
-
-const apiUrl = import.meta.env.VITE_APIURL;
-
-const axiosInstance = axios.create({
-    baseURL: apiUrl,
-    // timeout: 1000,
-    headers: {
-        // 'Content-Type': 'application/json',
-        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-    },
-});
 
 interface IPromotions {
     id: string;
@@ -21,20 +10,19 @@ interface IPromotions {
 }
 
 export interface BundleDetails {
-    id: string;
-    description: string;
-    caducityDate: string;
+    id?: string;
     name: string;
-    stock: number;
+    description: string;
     images: string[];
     price: number;
     currency: string;
-    weigth: number;
     measurement: string;
-    categories: [];
-    promotion: IPromotions[];
+    weight: number;
+    stock: number;
+    caducityDate: string;
+    category: [];
+    discount: IPromotions[];
     products: Item[];
-
 }
 
 const useBundleDetails = (idBundle: string) => {
@@ -47,12 +35,8 @@ const useBundleDetails = (idBundle: string) => {
         setError(null);
 
         try {
-            const response = await axiosInstance.get<BundleDetails>('/bundle', {
-                params: {
-                    id: idBundle,
-                },
-            }
-            );
+            const bundleInstanceApi = BundleInstanceApi.getInstance();
+            const response = await bundleInstanceApi.get<BundleDetails>(`/${idBundle}`);
             setBundle(response.data);
         } catch (err: any) {
             setError(err.message);

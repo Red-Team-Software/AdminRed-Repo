@@ -1,5 +1,6 @@
 import useProductForm from "@/hooks/products/use-product-form";
 import {
+    Image,
     Modal,
     ModalBody,
     ModalContent,
@@ -9,15 +10,17 @@ import {
     Textarea,
     ModalFooter,
     DateInput,
+    Spinner,
 } from "@nextui-org/react";
 import { Form, Formik, FormikErrors } from "formik";
 import ReactDOM from "react-dom";
-import { ProductFormValues } from "@/hooks/products/use-product-form"; 
+import { ProductFormValues } from "@/hooks/products/use-product-form";
 import { ModalFormProps } from "@/types";
+import { title } from "@/components/primitives";
 
 
 function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
-    const { initialProduct, isFetching, errorSaving, saveProductApi } = useProductForm(id);
+    const { initialProduct, isFetching, errorSaving, saveProductApi, isErrorSaving } = useProductForm(id);
 
     const handleFileChange = (
         event: React.ChangeEvent<HTMLInputElement>,
@@ -33,8 +36,7 @@ function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
     return ReactDOM.createPortal(
         <Modal isOpen={isOpen} scrollBehavior="inside" size="4xl" onClose={onOpen}>
             <ModalContent>
-                <ModalHeader className="flex justify-center">{id ? "Edit" : "Create"} Product Form</ModalHeader>
-                
+                <ModalHeader className={`${title({ size: "sm" })} text-center`}>{id ? "Edit" : "Create"} Product Form</ModalHeader>
                 <ModalBody>
                     <Formik
                         enableReinitialize={true}
@@ -44,9 +46,9 @@ function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
                             if (
                                 !values.name ||
                                 values.name.trim() === "" ||
-                                values.name.length < 3
+                                values.name.length < 5
                             ) {
-                                errors.name = "Required and must be at least 3 characters";
+                                errors.name = "Required and must be at least 5 characters";
                             }
                             if (
                                 !values.description ||
@@ -75,7 +77,7 @@ function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
                                 errors.measurement = "Required";
                             }
 
-                            if (!values.images || values.images.length < 1) {
+                            if (!id && (!values.images || values.images.length === 0)) {
                                 errors.images = "Required";
                             }
 
@@ -83,12 +85,13 @@ function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
                         }}
                         onSubmit={async (values, { setSubmitting }) => {
                             setSubmitting(true);
-                            
+
                             // console.log(values);
                             await saveProductApi(values, id);
                             setSubmitting(false);
-                            if (!errorSaving) {
-                                onOpen();
+
+                            if (!isErrorSaving && !errorSaving) {
+                                alert("Product saved successfully");
                             }
                         }}
                     >
@@ -104,7 +107,18 @@ function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
                             setFieldValue,
                         }) => (
                             <Form onSubmit={handleSubmit} className="flex flex-col gap-3">
-                                
+
+                                {
+                                    isErrorSaving && <div className="text-red-500 text-center">{errorSaving}</div>
+                                }
+
+                                {
+                                    isFetching && <div className="text-center">
+                                        Loading...
+                                        <Spinner/>
+                                    </div>
+                                }
+
                                 <Input
                                     type="text"
                                     name="name"
@@ -216,7 +230,7 @@ function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
                                     />
                                 </div>
                                 <Input
-                                    isRequired
+                                    isRequired={id ? false : true}
                                     type="file"
                                     name="images"
                                     label="Images"
@@ -227,12 +241,43 @@ function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
                                             return errors.images.toString();
                                     }}
                                 />
+                                {values.images.length === 0 && !id ? (
+                                    <div className="text-red-500 text-sm">Must provide an image</div>
+                                ) : null}
+                                <div className="flex flex-row gap-3">
+                                    {initialProduct.imagesUrl &&
+                                        initialProduct.imagesUrl.map((image: any, index: number) => (
+                                            <Image
+                                                key={index}
+                                                src={image}
+                                                alt="product"
+                                                width={40}
+                                                height={40}
+                                            />
+                                        ))}
+                                    {values.images &&
+                                        values.images.map((image: any, index: number) => (
+                                            <Image
+                                                key={index}
+                                                src={URL.createObjectURL(image)}
+                                                alt="product"
+                                                width={40}
+                                                height={40}
+                                                onDoubleClick={() => setFieldValue('images', values.images.filter((_, i) => i !== index))}
+                                            />
+                                        ))}
+                                </div>
+                                {values.images && values.images.length > 0 ?
+                                    <p className="text-sm text-gray-500 mt-4">Double click to remove image</p>
+                                    : null
+                                }
+
                                 <ModalFooter className="flex justify-center py-4">
                                     {isSubmitting && (
                                         <div className="flex justify-center">
                                             <span className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900"></span>
-                                            </div>
-                                            )}
+                                        </div>
+                                    )}
                                     {errorSaving && (
                                         <div className="text-red-500 text-center">{errorSaving}</div>
                                     )}
@@ -243,7 +288,7 @@ function ProductForm({ id, isOpen, onOpen }: ModalFormProps) {
                                         size="lg"
                                         color="success"
                                         type="submit"
-                                        disabled={!isValid || isSubmitting || isFetching || errorSaving? true : false || id? true : false}
+                                        disabled={!isValid || isSubmitting || isFetching || errorSaving ? true : false}
                                         className="text-white disabled:bg-slate-400"
                                     >
                                         Save

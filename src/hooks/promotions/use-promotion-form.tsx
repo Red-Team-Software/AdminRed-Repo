@@ -1,24 +1,12 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Item } from '@/types';
 import { IPromotionsDetails } from './use-promotions-details';
 import { Product } from '../products/use-products';
+import PromotionInstanceApi from '@/api/promotion-instance-api';
+import ProductInstaceApi from '@/api/product-instance-api';
+import BundleInstanceApi from '@/api/bundle-instance-api';
 
-const apiUrl = import.meta.env.VITE_APIURL;
 
-const axiosInstance = axios.create({
-    baseURL: apiUrl + '/promotion',
-    headers: {
-        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-    },
-});
-
-const axiosInstanceItems = axios.create({
-    baseURL: apiUrl,
-    headers: {
-        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-    },
-});
 
 export interface PromotionFormValues {
     id?: string;
@@ -50,6 +38,8 @@ const usePromotionForm = (idPromotion?: string) => {
     ]
 
     const [ isLoading, setIsLoading ] = useState<boolean>(false);
+    const [ isError, setIsError ] = useState<boolean>(false);
+
     const [ error, setError ] = useState<string | null>(null);
     const [ itemType, setItemType ] = useState<Item>(ItemsTypeList[0]);
     const [ itemsFetched, setItemsFetched ] = useState<Item[]>([]);
@@ -59,11 +49,12 @@ const usePromotionForm = (idPromotion?: string) => {
     const savePromotion = async (promotion: PromotionFormValues, id?: string) => {
         setIsLoading(true);
         setError(null);
+        setIsError(false);
 
         const formattedValues: any = {
             name: promotion.name,
             description: promotion.description,
-            avaleableState: promotion.avaleableState === 'YES' ? true : false,
+            state: promotion.avaleableState === 'YES' ? 'avaleable' : 'unabaleable',
             discount: parseFloat(promotion.discount) / 100,
         };
 
@@ -82,11 +73,13 @@ const usePromotionForm = (idPromotion?: string) => {
                 console.log('update');
                 return;
             } else {
-                const response = await axiosInstance.post('/create', formattedValues);
+                const promotionInstanceApi = PromotionInstanceApi.getInstance();
+                const response = await promotionInstanceApi.post('/create', formattedValues);
                 console.log(response);
             }
         } catch (err: any) {
             console.log(err);
+            setIsError(true);
             setError('Error saving product: ' + err.response.data.message,);
         } finally {
             setIsLoading(false);
@@ -98,12 +91,10 @@ const usePromotionForm = (idPromotion?: string) => {
 
         setIsLoading(true);
         setError(null);
+        setIsError(false);
         try {
-            const response = await axiosInstance.get<IPromotionsDetails>(``, {
-                params: {
-                    id: id,
-                },
-            });
+            const promotionInstanceApi = PromotionInstanceApi.getInstance();
+            const response = await promotionInstanceApi.get<IPromotionsDetails>(`/${id}`);
             setInitialPromotion({
                 id: response.data.id,
                 name: response.data.name,
@@ -116,6 +107,7 @@ const usePromotionForm = (idPromotion?: string) => {
             });
         } catch (err: any) {
             console.error(err);
+            setIsError(true);
             setError(err.message);
         } finally {
             setIsLoading(false);
@@ -133,13 +125,14 @@ const usePromotionForm = (idPromotion?: string) => {
 
         setIsLoading(true);
         setError(null);
-
+        setIsError(false);
         try {
             if (!itemType) {
                 return;
             }
             if (itemId === '1') {
-                const response = await axiosInstanceItems.get<Product[]>('/product/all', {
+                const productInstanceApi = ProductInstaceApi.getInstance();
+                const response = await productInstanceApi.get<Product[]>('/many', {
                     params: {
                         page,
                         perPage: 7,
@@ -156,13 +149,16 @@ const usePromotionForm = (idPromotion?: string) => {
                 setItemsFetched(products);
             }
             if (itemId === '2') {
-            //     const response = await axiosInstanceItems.get<Item[]>('/bundle/all', {
-            //         params: {
-            //             page,
-            //             perPage: 5,
-            //         },
-            //     });
-                setItemsFetched([]);
+                const bundleInstanceApi = BundleInstanceApi.getInstance();
+                
+                const { data } = await bundleInstanceApi.get<Item[]>('/many', {
+                    params: {
+                        page,
+                        perPage: 5,
+                    },
+                });
+
+                setItemsFetched(data);
             }
             if (itemType.id === '3') {
             //     const response = await axiosInstanceItems.get<Item[]>('/category/all', {
@@ -175,6 +171,7 @@ const usePromotionForm = (idPromotion?: string) => {
             }
         } catch (err: any) {
             console.error(err);
+            setIsError(true);
             setError(err.message);
         } finally {
             setIsLoading(false);
@@ -203,7 +200,7 @@ const usePromotionForm = (idPromotion?: string) => {
     }, []);
 
 
-    return { initialPromotion, isFetching: isLoading, errorSaving: error, savePromotionApi: savePromotion, itemType, handleSelectedType, ItemsTypeList, itemsFetched, handlePage, page };
+    return { initialPromotion, isFetching: isLoading, errorSaving: error, isErrorSaving: isError, savePromotionApi: savePromotion, itemType, handleSelectedType, ItemsTypeList, itemsFetched, handlePage, page };
 };
 
 export default usePromotionForm;

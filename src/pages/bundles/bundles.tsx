@@ -12,7 +12,7 @@ import useShowList from "@/hooks/use-showlist";
 
 export default function BundlesPage() {
 
-  const { bundles, isLoading, error, page, handlePage, deleteBundle } = useBundles();
+  const { bundles, isLoading, error, page, handlePage, deleteBundle, fetchBundles } = useBundles();
 
   const {isModalOpen, modalTargetState ,selectedItem, handleCloseModal, handleOpenModal } = useShowList<Bundle>(bundles);
 
@@ -52,7 +52,7 @@ export default function BundlesPage() {
                     </TableRow>
                   ))}
                 </TableBody>
-              ): <TableBody emptyContent={`No products to show`}>{[]}</TableBody>}
+              ): <TableBody emptyContent={`No bundles to show`}>{[]}</TableBody>}
           </Table>
 
           
@@ -75,14 +75,20 @@ export default function BundlesPage() {
       {isModalOpen && modalTargetState === ModalTarget.INSERT && (
         <BundleForm
           isOpen={isModalOpen}
-          onOpen={handleCloseModal}
+          onOpen={() => {
+            handleCloseModal()
+            fetchBundles()
+          }}
         />
       )} 
 
       {isModalOpen && modalTargetState === ModalTarget.EDIT && (
         <BundleForm
         isOpen={isModalOpen}
-        onOpen={handleCloseModal}
+        onOpen={() => {
+          handleCloseModal()
+          fetchBundles()
+        }}
         id={selectedItem!.id}
       />
       )} 

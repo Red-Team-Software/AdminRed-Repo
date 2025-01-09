@@ -1,15 +1,16 @@
 import ButtonsPagination from '@/components/buttons-pagination';
 import { ListboxWrapper } from '@/components/listbox-wrapper';
+import { title } from '@/components/primitives';
 import useBundleForm, { BundleFormValues } from '@/hooks/bundles/use-bundle-form';
 import { ModalFormProps } from '@/types'
 import { Button } from '@nextui-org/button';
 import { Textarea } from '@nextui-org/input';
-import { Modal, ModalContent, ModalHeader, ModalBody, DateInput, ModalFooter, Input, Listbox, ListboxItem, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow} from '@nextui-org/react';
+import { Modal, ModalContent, ModalHeader, ModalBody, DateInput, ModalFooter, Input, Listbox, ListboxItem, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Image, Spinner } from '@nextui-org/react';
 import { Formik, FormikErrors, Form } from 'formik';
 import ReactDOM from 'react-dom';
 
 function BundleForm({ id, isOpen, onOpen }: ModalFormProps) {
-    const { initialBundle, isFetching, errorSaving, saveBundleApi, itemsFetched, page, handlePage  } = useBundleForm(id);
+    const { initialBundle, isFetching, errorSaving, saveBundleApi, itemsFetched, page, handlePage, isErrorSaving } = useBundleForm(id);
 
     const handleFileChange = (
         event: React.ChangeEvent<HTMLInputElement>,
@@ -26,8 +27,7 @@ function BundleForm({ id, isOpen, onOpen }: ModalFormProps) {
 
         <Modal isOpen={isOpen} scrollBehavior="inside" size="4xl" onClose={onOpen}>
             <ModalContent>
-                <ModalHeader className="flex justify-center">{id ? "Edit" : "Create"} Bundle Form</ModalHeader>
-                
+                <ModalHeader className={`${title({ size: "sm" })} text-center`}>{id ? "Edit" : "Create"} Bundle Form</ModalHeader>
                 <ModalBody>
                     <Formik
                         enableReinitialize={true}
@@ -60,19 +60,19 @@ function BundleForm({ id, isOpen, onOpen }: ModalFormProps) {
                                 errors.stock = "Required and must be greater than 1";
                             }
 
-                            if (!values.weigth || parseFloat(values.weigth) < 1) {
-                                errors.weigth = "Required and must be greater than 1";
+                            if (!values.weight || parseFloat(values.weight) < 1) {
+                                errors.weight = "Required and must be greater than 1";
                             }
 
                             if (!values.measurement) {
                                 errors.measurement = "Required";
                             }
 
-                            if (!values.images || values.images.length < 1) {
+                            if (!id && (!values.images || values.images.length === 0)) {
                                 errors.images = "Required";
                             }
 
-                            if ( values.products.length < 2 ) {
+                            if (values.products.length < 2) {
                                 errors.products = "Required at least 2 products";
                             }
 
@@ -81,13 +81,14 @@ function BundleForm({ id, isOpen, onOpen }: ModalFormProps) {
 
                         onSubmit={async (values, { setSubmitting }) => {
                             setSubmitting(true);
-                            
+
                             console.log(values);
                             await saveBundleApi(values, id);
 
                             setSubmitting(false);
-                            if (!errorSaving) {
-                                onOpen();
+                            
+                            if (!isErrorSaving && !errorSaving) {
+                                alert("Product saved successfully");
                             }
                         }}
                     >
@@ -103,7 +104,17 @@ function BundleForm({ id, isOpen, onOpen }: ModalFormProps) {
                             setFieldValue,
                         }) => (
                             <Form onSubmit={handleSubmit} className="flex flex-col gap-3">
-                                
+
+                                {
+                                    isErrorSaving && <div className="text-red-500 text-center">{errorSaving}</div>
+                                }
+
+                                {
+                                    isFetching && <div className="text-center">
+                                        Loading...
+                                        <Spinner/>
+                                    </div>
+                                }
                                 <Input
                                     type="text"
                                     name="name"
@@ -193,11 +204,11 @@ function BundleForm({ id, isOpen, onOpen }: ModalFormProps) {
                                         name="weigth"
                                         label="Weigth"
                                         placeholder="0.00"
-                                        value={values.weigth}
+                                        value={values.weight}
                                         onBlur={handleBlur}
                                         onChange={handleChange}
                                         validate={() => {
-                                            if (errors.weigth && touched.weigth) return errors.weigth;
+                                            if (errors.weight && touched.weight) return errors.weight;
                                         }}
                                     />
                                     <Input
@@ -227,8 +238,28 @@ function BundleForm({ id, isOpen, onOpen }: ModalFormProps) {
                                     }}
                                 />
 
-                                
-                            <div className='flex justify-between items-start m-8'>
+                                {values.images.length === 0 && !id ? (
+                                    <div className="text-red-500 text-sm">Must provide an image</div>
+                                ) : null}
+                                <div className="flex flex-row gap-3">
+                                    {values.images &&
+                                        values.images.map((image: any, index: number) => (
+                                            <Image
+                                                key={index}
+                                                src={URL.createObjectURL(image)}
+                                                alt="product"
+                                                width={40}
+                                                height={40}
+                                                onDoubleClick={() => setFieldValue('images', values.images.filter((_, i) => i !== index))}
+                                            />
+                                        ))}
+                                </div>
+                                {values.images && values.images.length > 0 ?
+                                    <p className="text-sm text-gray-500 mt-4">Double click to remove image</p>
+                                    : null
+                                }
+
+                                <div className='flex justify-between items-start m-8'>
                                     <div className="w-1/2">
                                         <h2 className="mt-4 font-bold">Products Selected:</h2>
                                         <ListboxWrapper>
@@ -265,7 +296,7 @@ function BundleForm({ id, isOpen, onOpen }: ModalFormProps) {
                                                         <TableRow key={item.id}>
                                                             <TableCell>{item.name}</TableCell>
                                                             <TableCell className="flex gap-1 items-center">
-                                                                <Button color="primary" size="sm" variant="flat" 
+                                                                <Button color="primary" size="sm" variant="flat"
                                                                     onPress={() => {
                                                                         if (values.products.find((p) => p.id === item.id)) return;
                                                                         setFieldValue('products', [...values.products, item])
@@ -285,8 +316,8 @@ function BundleForm({ id, isOpen, onOpen }: ModalFormProps) {
                                     {isSubmitting && (
                                         <div className="flex justify-center">
                                             <span className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900"></span>
-                                            </div>
-                                            )}
+                                        </div>
+                                    )}
                                     {errorSaving && (
                                         <div className="text-red-500 text-center">{errorSaving}</div>
                                     )}
@@ -297,7 +328,7 @@ function BundleForm({ id, isOpen, onOpen }: ModalFormProps) {
                                         size="lg"
                                         color="success"
                                         type="submit"
-                                        disabled={!isValid || isSubmitting || isFetching || errorSaving? true : false || id? true : false}
+                                        disabled={!isValid || isSubmitting || isFetching || errorSaving ? true : false}
                                         className="text-white disabled:bg-slate-400"
                                     >
                                         Save

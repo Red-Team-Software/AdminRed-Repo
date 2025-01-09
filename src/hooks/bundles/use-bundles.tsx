@@ -1,15 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
-
-
-const apiUrl = import.meta.env.VITE_APIURL;
-
-const axiosInstance = axios.create({
-    baseURL: apiUrl + '/bundle',
-    headers: {
-        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-    },
-});
+import BundleInstanceApi from '@/api/bundle-instance-api';
 
 export interface Bundle {
     id: string;
@@ -31,7 +21,8 @@ const useBundles = () => {
         setError(null);
 
         try {
-            const response = await axiosInstance<Bundle[]>('/all', {
+            const bundleInstanceApi = BundleInstanceApi.getInstance();
+            const response = await bundleInstanceApi<Bundle[]>('/many', {
                 params: {
                     page,
                     perPage: 10,
@@ -49,18 +40,20 @@ const useBundles = () => {
     };
 
     const deleteBundle = async (id: string) => {
-        console.log('deleteBundle', id);
-        // setIsLoading(true);
-        // setError(null);
+        // console.log('deleteBundle', id);
+        setIsLoading(true);
+        setError(null);
 
-        // try {
-        //     await axiosInstance.delete(`/${id}`);
-        //     fetchProducts();
-        // } catch (err: any) {
-        //     setError(err.message);
-        // } finally {
-        //     setIsLoading(false);
-        // }
+        try {
+            const bundleInstanceApi = BundleInstanceApi.getInstance();
+            await bundleInstanceApi.delete(`/delete/${id}`);
+            fetchBundles();
+        } catch (err: any) {
+            console.error(err);
+            setError(err.message);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     useEffect(() => {
@@ -78,7 +71,7 @@ const useBundles = () => {
         }
     }
 
-    return { bundles, isLoading, error, page, handlePage, deleteBundle };
+    return { bundles, isLoading, error, page, handlePage, deleteBundle, fetchBundles };
 };
 
 export default useBundles;

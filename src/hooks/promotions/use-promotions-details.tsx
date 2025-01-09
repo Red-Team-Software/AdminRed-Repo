@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Item } from '@/types';
+import PromotionInstanceApi from '@/api/promotion-instance-api';
 
 
-const apiUrl = import.meta.env.VITE_APIURL;
 
 export interface IPromotionsDetails {
     id:             string;
@@ -16,17 +15,6 @@ export interface IPromotionsDetails {
     categories:     Item[];
 }
 
-
-const axiosInstance = axios.create({
-    baseURL: apiUrl + '/promotion',
-    // timeout: 1000,
-    headers: {
-        // 'Content-Type': 'application/json',
-        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-    },
-});
-
-
 const usePromotionDetails = (idPomotion: string) => {
     const [promotion, setPromotion] = useState<IPromotionsDetails>();
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -37,14 +25,10 @@ const usePromotionDetails = (idPomotion: string) => {
         setError(null);
 
         try {
-            const response = await axiosInstance.get<IPromotionsDetails>('', {
-                params: {
-                    id: idPomotion,
-                },
-            }
-            );
-            console.log(response)
-            setPromotion(response.data);
+            const promotionInstanceApi = PromotionInstanceApi.getInstance();
+            const { data } = await promotionInstanceApi.get<IPromotionsDetails>(`/${idPomotion}`);
+            // console.log(data)
+            setPromotion(data);
         } catch (err: any) {
             setError(err.message);
         } finally {

@@ -1,52 +1,52 @@
 import { ModalTarget } from "@/types";
 import { title } from "@/components/primitives";
-import usePromotions, { Promotion } from "@/hooks/promotions/use-promotions"
 import ButtonsPagination from "@/components/buttons-pagination";
 import DefaultLayout from "@/layouts/default";
 import { Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@nextui-org/react";
 import useShowList from "@/hooks/use-showlist";
-import PromotionDetailsPage from "./promotionsDetails";
 import DeleteModal from "@/components/delete-modal";
-import PromotionForm from "./promotionForm";
+import useCupons, { Cupon } from "@/hooks/cupons/use-cupons";
+import CuponForm from "./cuponForm";
 
-function PromotionsPage() {
+function CuponsPage() {
 
-    const { promotions, isLoading, error, page, handlePage, deletePromotion } = usePromotions();
+    const { cupons, isLoading, error, page, handlePage, deleteCupon } = useCupons();
 
-    const { isModalOpen, modalTargetState, selectedItem, handleCloseModal, handleOpenModal } = useShowList<Promotion>(promotions);
-    
+    const { isModalOpen, modalTargetState, selectedItem, handleCloseModal, handleOpenModal } = useShowList<Cupon>(cupons);
+
 
     return (
         <DefaultLayout>
             <section className="flex flex-col items-center py-4 md:py-10">
                 <div className="container mx-auto text-center justify-center">
                     <div className="flex items-end justify-between">
-                        <h1 className={title()}>Promotions List Page</h1>
-                        <Button color="success" size="md" className="text-white" onPress={() =>{handleOpenModal(ModalTarget.INSERT)}}>Add ➕</Button>
+                        <h1 className={title()}>Cupons List Page</h1>
+                        <Button color="success" size="md" className="text-white" onPress={() => { handleOpenModal(ModalTarget.INSERT) }}>Add ➕</Button>
                     </div>
 
-                    <Table isStriped aria-label="promotion list" className="my-8 w-full">
+                    <Table aria-label="promotion list" className="my-8 w-full">
                         <TableHeader>
+                            <TableColumn>CODE</TableColumn>
                             <TableColumn>NAME</TableColumn>
-                            <TableColumn>IS AVAILABLE</TableColumn>
                             <TableColumn>DISCOUNT</TableColumn>
+                            <TableColumn>STATE</TableColumn>
                             <TableColumn>ACTIONS</TableColumn>
                         </TableHeader>
                         {isLoading ? (
                             <TableBody emptyContent={"loading..."}>{[]}</TableBody>
                         ) : error ? (
                             <TableBody emptyContent={`Error: ${error}`}>{[]}</TableBody>
-                        ) : promotions && promotions.length > 0 ? (
+                        ) : cupons && cupons.length > 0 ? (
                             <TableBody>
-                                {promotions.map((prom) => (
-                                    <TableRow key={prom.id}>
-                                        <TableCell>{prom.name}</TableCell>
-                                        <TableCell>{ prom.state === 'avaleable'? 'Si' : 'No' }</TableCell>
-                                        <TableCell>{prom.discount * 100} %</TableCell>
+                                {cupons.map((cup) => (
+                                    <TableRow key={cup.id}>
+                                        <TableCell>{cup.code}</TableCell>
+                                        <TableCell>{cup.name}</TableCell>
+                                        <TableCell>{cup.discount * 100} %</TableCell>
+                                        <TableCell>{cup.state ? 'Active' : 'Inactive'}</TableCell>
                                         <TableCell className="flex gap-1 items-center">
-                                            <Button color="primary" size="sm" variant="flat" onPress={() => handleOpenModal(ModalTarget.VIEW, prom.id)}>View</Button>
-                                            <Button color="warning" size="sm" variant="flat" onPress={() => handleOpenModal(ModalTarget.EDIT, prom.id)}>Edit</Button>
-                                            <Button color="danger" size="sm" variant="flat" onPress={() => handleOpenModal(ModalTarget.DELETE, prom.id)}>Delete</Button>
+                                            <Button color="warning" size="sm" variant="flat" onPress={() => handleOpenModal(ModalTarget.EDIT, cup.id)}>Edit</Button>
+                                            <Button color="danger" size="sm" variant="flat" onPress={() => handleOpenModal(ModalTarget.DELETE, cup.id)}>Delete</Button>
                                         </TableCell>
                                     </TableRow>
                                 ))}
@@ -57,36 +57,29 @@ function PromotionsPage() {
 
                     <ButtonsPagination
                         currentPage={page}
-                        isLastPage={promotions.length < 10}
+                        isLastPage={cupons.length < 10}
                         handlePage={handlePage}
                     />
                 </div>
             </section>
 
-            {isModalOpen && modalTargetState === ModalTarget.VIEW && (
-                <PromotionDetailsPage
-                    id={selectedItem!.id}
-                    isOpen={isModalOpen}
-                    onOpen={handleCloseModal}
-                />
-            )}
 
             {isModalOpen && modalTargetState === ModalTarget.INSERT && (
-                <PromotionForm
+                <CuponForm
                     isOpen={isModalOpen}
                     onOpen={handleCloseModal}
                 />
             )}
 
-            {/*
+
             {isModalOpen && modalTargetState === ModalTarget.EDIT && (
-                <ProductForm
+                <CuponForm
                     isOpen={isModalOpen}
                     onOpen={handleCloseModal}
-                    id={selectedProduct!.id}
+                    id={selectedItem!.id}
                 />
             )}
-            */}
+
 
             {isModalOpen && modalTargetState === ModalTarget.DELETE && (
                 <DeleteModal
@@ -94,14 +87,14 @@ function PromotionsPage() {
                     isOpen={isModalOpen}
                     onOpen={handleCloseModal}
                     onConfirm={() => {
-                        deletePromotion(selectedItem!.id);
+                        deleteCupon(selectedItem!.id);
                         handleCloseModal();
                     }}
                 />
-            )} 
+            )}
 
         </DefaultLayout>
     )
 }
 
-export default PromotionsPage
+export default CuponsPage;

@@ -42,7 +42,7 @@ export const Navbar = () => {
       </NavbarContent>
 
 
-      <NavbarContent className="hidden sm:flex gap-8" justify="center">
+      <NavbarContent className="hidden sm:flex gap-6" justify="center">
         {siteConfig.navItems.map((item) => (
             <NavbarItem key={item.href}>
               <Link

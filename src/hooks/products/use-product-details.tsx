@@ -1,17 +1,5 @@
+import ProductInstanceApi from '@/api/product-instance-api';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
-
-
-const apiUrl = import.meta.env.VITE_APIURL;
-
-const axiosInstance = axios.create({
-    baseURL: apiUrl,
-    // timeout: 1000,
-    headers: {
-        // 'Content-Type': 'application/json',
-        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-    },
-});
 
 interface IPromotions {
     id: string;
@@ -20,18 +8,18 @@ interface IPromotions {
 }
 
 export interface ProductDetails {
-    id: string;
-    description: string;
-    caducityDate: string;
+    id?: string;
     name: string;
-    stock: number;
+    description: string;
     images: string[];
     price: number;
     currency: string;
-    weigth: number;
+    weight: number;
     measurement: string;
+    caducityDate: string;
+    stock: number;
+    discount: IPromotions[];
     categories: [];
-    promotion: IPromotions[];
 }
 
 const useProductDetails = (idProduct: string) => {
@@ -42,14 +30,9 @@ const useProductDetails = (idProduct: string) => {
     const fetchProduct = async () => {
         setIsLoading(true);
         setError(null);
-
         try {
-            const response = await axiosInstance.get<ProductDetails>('/product', {
-                params: {
-                    id: idProduct,
-                },
-            }
-            );
+            const productInstanceApi = ProductInstanceApi.getInstance();
+            const response = await productInstanceApi.get<ProductDetails>(`/${idProduct}`);
             setProduct(response.data);
         } catch (err: any) {
             setError(err.message);

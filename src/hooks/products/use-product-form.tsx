@@ -1,17 +1,8 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { DateValue } from '@nextui-org/react';
 import { CalendarDate, parseDate } from "@internationalized/date";
 import { ProductDetails } from './use-product-details';
-
-const apiUrl = import.meta.env.VITE_APIURL;
-
-const axiosInstance = axios.create({
-    baseURL: apiUrl + '/product',
-    headers: {
-        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-    },
-});
+import ProductInstanceApi from '@/api/product-instance-api';
 
 
 const formatDateForInput = (dateString: string): DateValue => {
@@ -46,14 +37,18 @@ const useProductForm = (idProduct?: string) => {
         weigth: "1.00",
         measurement: "g",
     });
+    const [ originalProduct, setOriginalProduct ] = useState<ProductFormValues | null>(null);
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isError, setIsError] = useState<boolean>(false);
+
     const [error, setError] = useState<string | null>(null);
 
 
     const saveProduct = async (product: ProductFormValues, id?: string) => {
         setIsLoading(true);
         setError(null);
+        setIsError(false);
 
         const formattedValues = {
             ...product,
@@ -66,33 +61,53 @@ const useProductForm = (idProduct?: string) => {
 
 
         const formData = new FormData();
-        formData.append('name', formattedValues.name);
-        formData.append('price', formattedValues.price.toString());
-        formData.append('description', formattedValues.description);
-        formData.append('currency', formattedValues.currency);
+        if ((originalProduct && originalProduct.name !== formattedValues.name)|| !originalProduct) 
+            formData.append('name', formattedValues.name);
 
-        formData.append('stock', formattedValues.stock.toString());
-        formData.append('weigth', formattedValues.weight.toString());
-        formData.append('caducityDate', formattedValues.caducityDate);
-        formData.append('measurement', formattedValues.measurement);
+        if ((originalProduct && originalProduct.price !== formattedValues.price.toString()) || !originalProduct) 
+            formData.append('price', formattedValues.price.toString());
+
+        if ((originalProduct && originalProduct.description !== formattedValues.description )|| !originalProduct)
+            formData.append('description', formattedValues.description);
+
+        if ((originalProduct && originalProduct.currency !== formattedValues.currency )|| !originalProduct)
+            formData.append('currency', formattedValues.currency);
+
+        if ((originalProduct && originalProduct.stock !== formattedValues.stock.toString()) || !originalProduct)
+            formData.append('stock', formattedValues.stock.toString());
+
+        if ((originalProduct && originalProduct.weigth !== formattedValues.weigth.toString()) || !originalProduct)
+            formData.append('weigth', formattedValues.weight.toString());
+        
+        if ((originalProduct && originalProduct.measurement !== formattedValues.measurement) || !originalProduct)
+            formData.append('measurement', formattedValues.measurement);
+
+        if ((originalProduct && originalProduct.caducityDate.toString() !== formattedValues.caducityDate.toString()) || !originalProduct)
+            formData.append('caducityDate', formattedValues.caducityDate.toString());
+
+        // console.log('formData stock', formData.get('stock')? formData.get('stock') : 'no stock');
 
         // Agregar archivos al FormData
-        formattedValues.images.forEach((file: File) => {
-            formData.append('images', file);
-        });
-
-        console.log('formData', formData);
+        if (formattedValues.images.length > 0)
+            formattedValues.images.forEach((file: File) => {
+                formData.append('images', file);
+            });
 
         try {
             if (id) {
-                console.log('update');
-                return;
+                console.log('formattedValues', formData);
+                const api = ProductInstanceApi.getInstance();
+                const response = await api.patch(`/update/${id}`, formData);
+                console.log(response);
             } else {
-                const response = await axiosInstance.post('/create', formData);
+
+                const api = ProductInstanceApi.getInstance();
+                const response = await api.post('/create', formData);
                 console.log(response);
             }
         } catch (err: any) {
             console.log(err);
+            setIsError(true);
             setError('Error saving product: ' + err.response.data.message,);
         } finally {
             setIsLoading(false);
@@ -103,13 +118,11 @@ const useProductForm = (idProduct?: string) => {
 
         setIsLoading(true);
         setError(null);
+        setIsError(false);
 
         try {
-            const response = await axiosInstance.get<ProductDetails>(``, {
-                params: {
-                    id: id,
-                },
-            });
+            const api = ProductInstanceApi.getInstance();
+            const response = await api.get<ProductDetails>(`/${id}`);
             // console.log(response.data);
             setInitialProduct({
                 id: response.data.id,
@@ -121,11 +134,25 @@ const useProductForm = (idProduct?: string) => {
                 images: [], // Add an empty array or fetch the images if available
                 imagesUrl: response.data.images,
                 currency: response.data.currency,
-                weigth: response.data.weigth.toString(),
+                weigth: response.data.weight.toString(),
+                measurement: response.data.measurement,
+            });
+            setOriginalProduct({
+                id: response.data.id,
+                name: response.data.name,
+                price: response.data.price.toString(),
+                description: response.data.description,
+                caducityDate: formatDateForInput(response.data.caducityDate),
+                stock: response.data.stock.toString(),
+                images: [], // Add an empty array or fetch the images if available
+                imagesUrl: response.data.images,
+                currency: response.data.currency,
+                weigth: response.data.weight.toString(),
                 measurement: response.data.measurement,
             });
         } catch (err: any) {
             console.error(err);
+            setIsError(true);
             setError(err.message);
         } finally {
             setIsLoading(false);
@@ -145,7 +172,7 @@ const useProductForm = (idProduct?: string) => {
     }, []);
 
 
-    return { initialProduct, isFetching: isLoading, errorSaving: error, saveProductApi: saveProduct };
-};
+    return { initialProduct, isFetching: isLoading, errorSaving: error, isErrorSaving: isError, saveProductApi: saveProduct };
+}; 
 
 export default useProductForm;
