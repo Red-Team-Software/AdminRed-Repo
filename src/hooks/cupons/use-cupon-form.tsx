@@ -33,7 +33,7 @@ const useCuponForm = (idCupon?: string) => {
             code: cupon.code,
             name: cupon.name,
             discount: parseInt(cupon.discount)/100,
-            state: cupon.state === 'ACTIVE' ? true : false,
+            state: cupon.state === 'ACTIVE' ? 'avaleable' : 'unavaleable',
         };
         console.log('formData', formData);
 

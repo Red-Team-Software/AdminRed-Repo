@@ -53,7 +53,7 @@ const usePromotions = () => {
         fetchPromotions();
     }, [page]);
 
-    return { promotions, page, isLoading, error, handlePage, deletePromotion };
+    return { promotions, page, isLoading, error, handlePage, deletePromotion, fetchPromotions };
 };
 
 export default usePromotions;

@@ -50,7 +50,7 @@ const useCupons = () => {
         fetchCupons();
     }, [page]);
 
-    return { cupons, page, isLoading, error, handlePage, deleteCupon };
+    return { cupons, page, isLoading, error, handlePage, deleteCupon, fetchCupons };
 };
 
 export default useCupons;

@@ -54,7 +54,8 @@ function PromotionForm({ id, isOpen, onOpen }: ModalFormProps) {
                             setSubmitting(true);
                             await savePromotionApi(values, id);
                             setSubmitting(false);
-                            if ( !isErrorSaving ) onOpen();
+                            alert('Promotion saved');
+                            
                         }}
                     >
                         {({  

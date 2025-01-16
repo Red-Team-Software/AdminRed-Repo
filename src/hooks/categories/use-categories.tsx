@@ -8,9 +8,9 @@ export interface Category {
 }
 
 interface ICategoryResponse {
-    categoryId: string,
-    categoryName: string,
-    categoryImage: string,
+    id: string,
+    name: string,
+    image: string,
 }
 
 const useCategories = () => {
@@ -33,9 +33,9 @@ const useCategories = () => {
                 },
             });
             setCategories(response.data.map((category) => ({
-                id: category.categoryId,
-                name: category.categoryName,
-                imageUrl: category.categoryImage,
+                id: category.id,
+                name: category.name,
+                imageUrl: category.image,
             })));
         } catch (err: any) {
             setError(err.message);

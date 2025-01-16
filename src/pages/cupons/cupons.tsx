@@ -10,7 +10,7 @@ import CuponForm from "./cuponForm";
 
 function CuponsPage() {
 
-    const { cupons, isLoading, error, page, handlePage, deleteCupon } = useCupons();
+    const { cupons, isLoading, error, page, handlePage, deleteCupon, fetchCupons } = useCupons();
 
     const { isModalOpen, modalTargetState, selectedItem, handleCloseModal, handleOpenModal } = useShowList<Cupon>(cupons);
 
@@ -67,7 +67,10 @@ function CuponsPage() {
             {isModalOpen && modalTargetState === ModalTarget.INSERT && (
                 <CuponForm
                     isOpen={isModalOpen}
-                    onOpen={handleCloseModal}
+                    onOpen={ () => {
+                        fetchCupons();
+                        handleCloseModal();
+                    }}
                 />
             )}
 
@@ -75,8 +78,11 @@ function CuponsPage() {
             {isModalOpen && modalTargetState === ModalTarget.EDIT && (
                 <CuponForm
                     isOpen={isModalOpen}
-                    onOpen={handleCloseModal}
                     id={selectedItem!.id}
+                    onOpen={ () => {
+                        fetchCupons();
+                        handleCloseModal();
+                    }}
                 />
             )}
 

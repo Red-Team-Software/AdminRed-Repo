@@ -45,7 +45,7 @@ function CuponForm({ id, isOpen, onOpen }: ModalFormProps) {
                             setSubmitting(true);
                             await saveCuponApi(values, id);
                             setSubmitting(false);
-                            if ( !isErrorSaving ) onOpen();
+                            alert(`Cupon saved: ${errorSaving}`);
                         }}
                     >
                         {({  

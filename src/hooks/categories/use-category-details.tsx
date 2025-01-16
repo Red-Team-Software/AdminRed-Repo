@@ -34,7 +34,12 @@ const useCategoryDetails = (idCategory: string) => {
                         name: product.name,
                     };
                 }),
-                bundles: [],
+                bundles: response.data.bundles.map((bundle) => {
+                    return {
+                        id: bundle.id,
+                        name: bundle.name,
+                    };
+                }),
             });
         } catch (err: any) {
             setError(err.message);

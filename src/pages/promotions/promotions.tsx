@@ -11,7 +11,7 @@ import PromotionForm from "./promotionForm";
 
 function PromotionsPage() {
 
-    const { promotions, isLoading, error, page, handlePage, deletePromotion } = usePromotions();
+    const { promotions, isLoading, error, page, handlePage, deletePromotion, fetchPromotions } = usePromotions();
 
     const { isModalOpen, modalTargetState, selectedItem, handleCloseModal, handleOpenModal } = useShowList<Promotion>(promotions);
     
@@ -74,7 +74,10 @@ function PromotionsPage() {
             {isModalOpen && modalTargetState === ModalTarget.INSERT && (
                 <PromotionForm
                     isOpen={isModalOpen}
-                    onOpen={handleCloseModal}
+                    onOpen={()=>{
+                        fetchPromotions();
+                        handleCloseModal();
+                    }}
                 />
             )}
 
