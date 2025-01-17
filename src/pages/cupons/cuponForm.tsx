@@ -7,7 +7,7 @@ import ReactDOM from 'react-dom';
 
 function CuponForm({ id, isOpen, onOpen }: ModalFormProps) {
 
-    const { initialCupon, errorSaving, isFetching, isErrorSaving, saveCuponApi } = useCuponForm(id);
+    const { initialCupon, errorSaving, isFetching, saveCuponApi } = useCuponForm(id);
 
     const stateOption = ["ACTIVE", "INACTIVE"];
 

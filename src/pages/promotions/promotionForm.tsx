@@ -9,7 +9,7 @@ import ReactDOM from 'react-dom';
 
 function PromotionForm({ id, isOpen, onOpen }: ModalFormProps) {
 
-    const { initialPromotion, errorSaving, isFetching, ItemsTypeList, itemsFetched, handleSelectedType, handlePage, page, itemType, savePromotionApi, isErrorSaving } = usePromotionForm(id);
+    const { initialPromotion, errorSaving, isFetching, ItemsTypeList, itemsFetched, handleSelectedType, handlePage, page, itemType, savePromotionApi } = usePromotionForm(id);
 
     const availableOption = ["YES", "NO"];
 
